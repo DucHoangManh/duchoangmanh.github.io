@@ -2,46 +2,46 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://duchoangmanh.github.io/page/categories/</loc>
+    <loc>https://duchoangmanh.github.io/categories/</loc>
     <lastmod>2021-12-31T23:24:26+07:00</lastmod>
   </url><url>
-    <loc>https://duchoangmanh.github.io/page/posts/technical/create-a-web-framework-in-go/</loc>
+    <loc>https://duchoangmanh.github.io/posts/technical/create-a-web-framework-in-go/</loc>
     <lastmod>2021-12-31T23:24:26+07:00</lastmod>
   </url><url>
-    <loc>https://duchoangmanh.github.io/page/</loc>
+    <loc>https://duchoangmanh.github.io/</loc>
     <lastmod>2021-12-31T23:24:26+07:00</lastmod>
   </url><url>
-    <loc>https://duchoangmanh.github.io/page/tags/english/</loc>
+    <loc>https://duchoangmanh.github.io/tags/english/</loc>
     <lastmod>2021-12-31T23:24:26+07:00</lastmod>
   </url><url>
-    <loc>https://duchoangmanh.github.io/page/tags/framework/</loc>
+    <loc>https://duchoangmanh.github.io/tags/framework/</loc>
     <lastmod>2021-12-31T23:24:26+07:00</lastmod>
   </url><url>
-    <loc>https://duchoangmanh.github.io/page/tags/go/</loc>
+    <loc>https://duchoangmanh.github.io/tags/go/</loc>
     <lastmod>2021-12-31T23:24:26+07:00</lastmod>
   </url><url>
-    <loc>https://duchoangmanh.github.io/page/posts/</loc>
+    <loc>https://duchoangmanh.github.io/posts/</loc>
     <lastmod>2021-12-31T23:24:26+07:00</lastmod>
   </url><url>
-    <loc>https://duchoangmanh.github.io/page/tags/</loc>
+    <loc>https://duchoangmanh.github.io/tags/</loc>
     <lastmod>2021-12-31T23:24:26+07:00</lastmod>
   </url><url>
-    <loc>https://duchoangmanh.github.io/page/categories/technical/</loc>
+    <loc>https://duchoangmanh.github.io/categories/technical/</loc>
     <lastmod>2021-12-31T23:24:26+07:00</lastmod>
   </url><url>
-    <loc>https://duchoangmanh.github.io/page/tags/design-pattern/</loc>
+    <loc>https://duchoangmanh.github.io/tags/design-pattern/</loc>
     <lastmod>2021-12-26T22:14:29+07:00</lastmod>
   </url><url>
-    <loc>https://duchoangmanh.github.io/page/posts/technical/design-pattern-than-thien-trong-go/</loc>
+    <loc>https://duchoangmanh.github.io/posts/technical/design-pattern-than-thien-trong-go/</loc>
     <lastmod>2021-12-26T22:14:29+07:00</lastmod>
   </url><url>
-    <loc>https://duchoangmanh.github.io/page/tags/efective-go/</loc>
+    <loc>https://duchoangmanh.github.io/tags/efective-go/</loc>
     <lastmod>2021-12-26T22:14:29+07:00</lastmod>
   </url><url>
-    <loc>https://duchoangmanh.github.io/page/archives/</loc>
+    <loc>https://duchoangmanh.github.io/archives/</loc>
   </url><url>
-    <loc>https://duchoangmanh.github.io/page/search/</loc>
+    <loc>https://duchoangmanh.github.io/search/</loc>
   </url><url>
-    <loc>https://duchoangmanh.github.io/page/series/</loc>
+    <loc>https://duchoangmanh.github.io/series/</loc>
   </url>
 </urlset>

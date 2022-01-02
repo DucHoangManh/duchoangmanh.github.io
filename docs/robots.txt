@@ -1,3 +1,3 @@
 User-agent: *
 Disallow:
-Sitemap: https://duchoangmanh.github.io/page/sitemap.xml
+Sitemap: https://duchoangmanh.github.io/sitemap.xml

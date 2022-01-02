@@ -2,20 +2,20 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>duchm</title>
-    <link>https://duchoangmanh.github.io/page/</link>
+    <link>https://duchoangmanh.github.io/</link>
     <description>Recent content on duchm</description>
     <image>
-      <url>https://duchoangmanh.github.io/page/papermod-cover.png</url>
-      <link>https://duchoangmanh.github.io/page/papermod-cover.png</link>
+      <url>https://duchoangmanh.github.io/papermod-cover.png</url>
+      <link>https://duchoangmanh.github.io/papermod-cover.png</link>
     </image>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Fri, 31 Dec 2021 23:24:26 +0700</lastBuildDate><atom:link href="https://duchoangmanh.github.io/page/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 31 Dec 2021 23:24:26 +0700</lastBuildDate><atom:link href="https://duchoangmanh.github.io/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Create a web framework in Go part 1: static routing prototype</title>
-      <link>https://duchoangmanh.github.io/page/posts/technical/create-a-web-framework-in-go/</link>
+      <link>https://duchoangmanh.github.io/posts/technical/create-a-web-framework-in-go/</link>
       <pubDate>Fri, 31 Dec 2021 23:24:26 +0700</pubDate>
       
-      <guid>https://duchoangmanh.github.io/page/posts/technical/create-a-web-framework-in-go/</guid>
+      <guid>https://duchoangmanh.github.io/posts/technical/create-a-web-framework-in-go/</guid>
       <description>This post contains my notes while implement caneweb - a gin-like minimal web framework/router after reading the first section of 7 days golang by geektutu (https://github.com/geektutu/7days-golang).
 How standard net/http package handle request? First, let&amp;rsquo;s look at a sample written with net/http package:
 func main() { http.HandleFunc(&amp;#34;/&amp;#34;, handler) http.HandleFunc(&amp;#34;/post&amp;#34;, getAllPost) log.Fatal(http.ListenAndServe(&amp;#34;localhost:8000&amp;#34;, nil)) } func handler(w http.ResponseWriter, r *http.Request) { fmt.Fprintf(w, &amp;#34;URL.Path = %q\n&amp;#34;, r.URL.Path) } This piece of code binds two endpoints with the corresponding handler function, and starts a web server at port 8000, terminates the server if some errors are returned.</description>
@@ -23,10 +23,10 @@ func main() { http.HandleFunc(&amp;#34;/&amp;#34;, handler) http.HandleFunc(&amp
     
     <item>
       <title>Design pattern thân thiện trong go</title>
-      <link>https://duchoangmanh.github.io/page/posts/technical/design-pattern-than-thien-trong-go/</link>
+      <link>https://duchoangmanh.github.io/posts/technical/design-pattern-than-thien-trong-go/</link>
       <pubDate>Sun, 26 Dec 2021 22:14:29 +0700</pubDate>
       
-      <guid>https://duchoangmanh.github.io/page/posts/technical/design-pattern-than-thien-trong-go/</guid>
+      <guid>https://duchoangmanh.github.io/posts/technical/design-pattern-than-thien-trong-go/</guid>
       <description>Tại sao lại có bài viết này?: Design pattern: Những giải pháp có thể tái sử dụng cho các vấn đề thường gặp tại một ngữ cảnh nhất định trong quá trinh thiết kế phần mềm.
 Bài viết này nói về một số Design pattern &amp;ldquo;thân thiện&amp;rdquo; hơn trong go, được mình tổng hợp dựa trên buổi talk của Ryan Djurovich (https://www.youtube.com/watch?v=HHqv3_rUr88) và một số nguồn tài liệu khác mà mình đọc được.</description>
     </item>
