@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>efective-go on duchm</title>
+    <link>https://duchoangmanh.github.io/page/tags/efective-go/</link>
+    <description>Recent content in efective-go on duchm</description>
+    <image>
+      <url>https://duchoangmanh.github.io/page/papermod-cover.png</url>
+      <link>https://duchoangmanh.github.io/page/papermod-cover.png</link>
+    </image>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Sun, 26 Dec 2021 22:14:29 +0700</lastBuildDate><atom:link href="https://duchoangmanh.github.io/page/tags/efective-go/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Design pattern thân thiện trong go</title>
+      <link>https://duchoangmanh.github.io/page/posts/technical/design-pattern-than-thien-trong-go/</link>
+      <pubDate>Sun, 26 Dec 2021 22:14:29 +0700</pubDate>
+      
+      <guid>https://duchoangmanh.github.io/page/posts/technical/design-pattern-than-thien-trong-go/</guid>
+      <description>Tại sao lại có bài viết này?: Design pattern: Những giải pháp có thể tái sử dụng cho các vấn đề thường gặp tại một ngữ cảnh nhất định trong quá trinh thiết kế phần mềm.
+Bài viết này nói về một số Design pattern &amp;ldquo;thân thiện&amp;rdquo; hơn trong go, được mình tổng hợp dựa trên buổi talk của Ryan Djurovich (https://www.youtube.com/watch?v=HHqv3_rUr88) và một số nguồn tài liệu khác mà mình đọc được.</description>
+    </item>
+    
+  </channel>
+</rss>
