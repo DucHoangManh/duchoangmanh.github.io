@@ -1,4 +1,4 @@
-baseURL: "https://duchoangmanh.github.io/page/"
+baseURL: "https://duchoangmanh.github.io/"
 title: duchm
 paginate: 5
 theme: PaperMod
