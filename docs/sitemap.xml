@@ -2,13 +2,19 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>https://duchoangmanh.github.io/</loc>
+    <lastmod>2022-07-13T00:01:23+07:00</lastmod>
+  </url><url>
+    <loc>https://duchoangmanh.github.io/posts/technical/go-reflection-qua-vi-du/</loc>
+    <lastmod>2022-07-13T00:01:23+07:00</lastmod>
+  </url><url>
+    <loc>https://duchoangmanh.github.io/posts/</loc>
+    <lastmod>2022-07-13T00:01:23+07:00</lastmod>
+  </url><url>
     <loc>https://duchoangmanh.github.io/categories/</loc>
     <lastmod>2021-12-31T23:24:26+07:00</lastmod>
   </url><url>
     <loc>https://duchoangmanh.github.io/posts/technical/create-a-web-framework-in-go/</loc>
-    <lastmod>2021-12-31T23:24:26+07:00</lastmod>
-  </url><url>
-    <loc>https://duchoangmanh.github.io/</loc>
     <lastmod>2021-12-31T23:24:26+07:00</lastmod>
   </url><url>
     <loc>https://duchoangmanh.github.io/tags/english/</loc>
@@ -18,9 +24,6 @@
     <lastmod>2021-12-31T23:24:26+07:00</lastmod>
   </url><url>
     <loc>https://duchoangmanh.github.io/tags/go/</loc>
-    <lastmod>2021-12-31T23:24:26+07:00</lastmod>
-  </url><url>
-    <loc>https://duchoangmanh.github.io/posts/</loc>
     <lastmod>2021-12-31T23:24:26+07:00</lastmod>
   </url><url>
     <loc>https://duchoangmanh.github.io/tags/</loc>
