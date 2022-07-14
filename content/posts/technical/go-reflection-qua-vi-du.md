@@ -72,7 +72,7 @@ Kết quả:
 
 ## Parse url query với reflection
 
-Xét bài toán cần viết một hàm nhận vào một `*http.Request` và trả về một sruct chưa các query lấy được từ request đó:
+Xét bài toán cần viết một hàm nhận vào một `*http.Request` và một struct sau đó fill dữ liệu từ URL query vào struct đó:
 ```go
 type Person struct {
 	Name string
