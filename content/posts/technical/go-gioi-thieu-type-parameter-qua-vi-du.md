@@ -17,7 +17,7 @@ func StringSliceContains(ss []string, match string) bool {
 	return false
 }
 ```
-Rõ ràng là trong quá trình sử dụng thực tế, ta sẽ gặp các usecase tương tự với các kiểu dữ liệu khác. Trước khi có generic, việc phổ biến nhất sẽ là viết riêng các hàm cụ thể cho từng kiểu dữ liệu `IntSliceContains()`, `Int64SliceContains()`... bên cạnh việc sử dụng code generation hay reflection.
+Rõ ràng là trong quá trình sử dụng thực tế, ta sẽ gặp các usecase tương tự với các kiểu dữ liệu khác. Trước khi có generic, việc phổ biến nhất sẽ là viết riêng các hàm cụ thể cho từng kiểu dữ liệu `IntSliceContains()`, `Int64SliceContains()`... bên cạnh việc sử dụng code generation hay reflection.   
 Có thể thấy các hàm này đều lặp lại một logic giống nhau, chỉ khác ở kiểu dữ liệu đầu vào, với generic, ta hoàn toàn có thể rút gọn lại các hàm này lại thành một, rất gọn và dễ dàng bảo trì về sau:   
 ```go
 func SliceContains[T comparable](ss []T, match T) bool {
@@ -56,8 +56,8 @@ func TestSliceContains(t *testing.T) {
 	fmt.Println(SliceContains(stringSlice, "c")) // true
 }
 ```
-Có thể thấy là khi gọi hàm không cần chỉ rõ ra T là kiểu gì mà chỉ cần truyền các parameter vào, compiler có thể tự hiểu và thực thi đúng hàm mà ta mong muốn, `SliceContains[int](intSlice, 5)` cũng tương đương với `SliceContains(intSlice, 5)`.  
-Ta cũng có thể viết một hàm kiểm tra phần tử có thuộc slice hay không mà không có ràng buộc, thay vào đó, truyền vào một funcion `equalFunc`thay cho toán tử `==`:
+Có thể thấy là khi gọi hàm không cần chỉ rõ ra T là kiểu gì mà chỉ cần truyền các parameter vào, go có thể tự hiểu và thực thi đúng hàm mà ta mong muốn, `SliceContains[int](intSlice, 5)` cũng tương đương với `SliceContains(intSlice, 5)`.  
+Ta cũng có thể viết một hàm kiểm tra phần tử có thuộc slice hay không mà không có ràng buộc, thay vào đó, truyền vào một funcion `equalFunc` để sử dụng thay cho toán tử `==`:
 ```go
 func SliceContainsWithEqual[T any](ss []T, match T, equalFunc func(T, T) bool) bool {
 	for _, s := range ss {
@@ -93,7 +93,7 @@ func (h *IntHeap) Pop() any {
 }
 ```
 
-Có thể nhận thấy trong nhiều trường hợp, ta chỉ quan tâm tới kiểu dữ liệu và method `Less`, còn cách triền khai tương tự như ví dụ trên.  
+Trong nhiều trường hợp, ta chỉ quan tâm tới kiểu dữ liệu và method `Less`, còn cách triền khai tương tự như ví dụ trên.  
 Có thể dùng type parameter để đơn giản hóa việc sử dụng heap như sau:
 ```go
 type Heap[T any] struct {
@@ -139,7 +139,7 @@ Type parameter cũng có thể sử dụng với `type` như trong ví dụ này
 Mấu chốt trong cách triển khai này chính là lưu lại `lessFunc` trong struct `Heap`, do ta không thể thay đổi method `Less` tại runtime, thay vào đó `Less` sẽ gọi vào hàm được lưu trong receiver.  
 Tuy nhiên có thể thấy rằng kiểu của các method như `Push` hay `Pop` lại là `any` và để đảm bảo implement `heap.Interface`, ta không thể sửa signature của các method này.  
 Thay vào đó ta sẽ wrap type mà implement heap interface trong một public Type mà sẽ nhận và trả về kết quả mong muốn:  
-Chuyển triền khai trên thành một unexported struct với tên `base`:
+Chuyển triển khai trên thành một unexported struct với tên `base`:
 ```go
 type base[T any] struct {
 	data     []T
@@ -223,10 +223,10 @@ Kết quả:
 ```
 -10 -5 0 2 4 5 8 9
 ```
-Clear hơn khá nhiều phải không?
+Clear hơn khá nhiều phải không? Có thể xem code đầy đủ tại [đây](https://github.com/DucHoangManh/generic-heap)
 
 ### 3. Khi nào dùng type parameter?
-- Khi cần gọi method của constraints interface thì không nên dùng type parameter mà nên dùng hàm bình thường nhận vào interface.
+- Khi dùng type parameter chỉ để gọi method của constraints thì không nên dùng type parameter mà nên dùng hàm bình thường nhận vào interface.
 thay vì 
 ```go
 func foo[T io.Writer](w T) {
