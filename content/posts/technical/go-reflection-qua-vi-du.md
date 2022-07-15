@@ -1,5 +1,5 @@
 ---
-title: "Go: Giới thiệu về Reflection qua ví dụ"
+title: "Go: Giới thiệu về reflection qua ví dụ"
 date: 2022-07-13T00:01:23+07:00
 tags: ["go", "efective-go"]
 ---

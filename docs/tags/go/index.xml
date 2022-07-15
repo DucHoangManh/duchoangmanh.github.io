@@ -11,7 +11,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <lastBuildDate>Wed, 13 Jul 2022 00:01:23 +0700</lastBuildDate><atom:link href="https://duchoangmanh.github.io/tags/go/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Go: Giới thiệu về Reflection qua ví dụ</title>
+      <title>Go: Giới thiệu về reflection qua ví dụ</title>
       <link>https://duchoangmanh.github.io/posts/technical/go-reflection-qua-vi-du/</link>
       <pubDate>Wed, 13 Jul 2022 00:01:23 +0700</pubDate>
       
@@ -22,7 +22,17 @@ Reflection trong go có thể được thực hiện thông qua reflect package.
     </item>
     
     <item>
-      <title>Go Tips and Optimization Notes</title>
+      <title>Go: Giới thiệu về type parameter (generic) qua ví dụ</title>
+      <link>https://duchoangmanh.github.io/posts/technical/go-gioi-thieu-type-parameter-qua-vi-du/</link>
+      <pubDate>Thu, 30 Jun 2022 20:21:52 +0700</pubDate>
+      
+      <guid>https://duchoangmanh.github.io/posts/technical/go-gioi-thieu-type-parameter-qua-vi-du/</guid>
+      <description>1. Kiểm tra sự xuất hiện của một phần tử trong slice Type parameter hay generic là một tính năng mới xuất hiện từ phiên bản 1.18 của Go. Với generic, ta có thể viết các hàm hoặc type có thể dùng được cho nhiều kiểu dữ liệu đầu vào khác nhau mà không cần phải lặp lại code nhiều lần.
+Hãy bắt đầu với một ví dụ đơn giản và phổ biến: Kiểm tra xem string có xuất hiện trong slice hay không</description>
+    </item>
+    
+    <item>
+      <title>Go tips and optimization notes</title>
       <link>https://duchoangmanh.github.io/posts/technical/go-tips-and-optimization-notes/</link>
       <pubDate>Tue, 14 Jun 2022 13:31:06 +0700</pubDate>
       

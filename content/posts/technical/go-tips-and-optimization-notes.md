@@ -1,5 +1,5 @@
 ---
-title: "Go Tips and Optimization Notes"
+title: "Go tips and optimization notes"
 date: 2022-06-14T13:31:06+07:00
 tags: ["go", "efective-go"]
 ---
