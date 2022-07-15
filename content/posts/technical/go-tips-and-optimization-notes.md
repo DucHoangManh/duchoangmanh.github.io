@@ -62,7 +62,7 @@ func main() {
 ```
  
 ### 3. Mutate a slice the right way
-Slice has a pointer to a backing array no not mean that it can be mutated by value
+Slice has a pointer to a backing array do not mean that it can be mutated by value  
 Let's look at the slice header from reflect package (a runtime representation of a slice but the idea is the same):
 ```go
 type SliceHeader struct {
@@ -124,7 +124,7 @@ We should use the third parameter when making a slice to allocate some memory fo
 ```go
 someSlice := make([]int, 0, size)
 ```
-And keep in mind that even if we use a slice with a part of an underlying array, the rest of that array may live in memory much longer than needed, consider copying to a new slice if necessary. 
+And keep in mind that even if we use a slice with a part of an underlying array, the rest of that array may live in memory much longer than needed, consider copying to a new slice if necessary.  
 Pre-allocating can be used for maps too!
 ```go
 someMap:= make(map[int]int, size)
