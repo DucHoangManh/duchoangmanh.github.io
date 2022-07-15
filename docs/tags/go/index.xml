@@ -9,9 +9,31 @@
       <link>https://duchoangmanh.github.io/papermod-cover.png</link>
     </image>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Fri, 31 Dec 2021 23:24:26 +0700</lastBuildDate><atom:link href="https://duchoangmanh.github.io/tags/go/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 13 Jul 2022 00:01:23 +0700</lastBuildDate><atom:link href="https://duchoangmanh.github.io/tags/go/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Create a web framework in Go part 1: static routing prototype</title>
+      <title>Go: Giới thiệu về Reflection qua ví dụ</title>
+      <link>https://duchoangmanh.github.io/posts/technical/go-reflection-qua-vi-du/</link>
+      <pubDate>Wed, 13 Jul 2022 00:01:23 +0700</pubDate>
+      
+      <guid>https://duchoangmanh.github.io/posts/technical/go-reflection-qua-vi-du/</guid>
+      <description>Reflection trong Go Reflection trong go giúp cho ta có thể theo dõi code tại thời điểm runtime, cho phép tiếp cận mã nguồn chương trình dưới dạng data có thể xử lý thay vì các lệnh có thể thực thi (một nhánh trong metaprogramming).
+Reflection trong go có thể được thực hiện thông qua reflect package. Một số khả năng của reflect:
+ Kiểm tra thông tin của một struct (số lượng method, số lượng field, đọc struct tag&amp;hellip;) mà không cần biết trước về struct đó.</description>
+    </item>
+    
+    <item>
+      <title>Go Tips and Optimization Notes</title>
+      <link>https://duchoangmanh.github.io/posts/technical/go-tips-and-optimization-notes/</link>
+      <pubDate>Tue, 14 Jun 2022 13:31:06 +0700</pubDate>
+      
+      <guid>https://duchoangmanh.github.io/posts/technical/go-tips-and-optimization-notes/</guid>
+      <description>Some Go tips (maybe some dark side too) and notes for writing better code.
+1. Efficiently converse between string and byte slice Gain some performance with the price of maintainability. Using the unsafe package is not advised but we can use it to efficiently converse between a string and byte slice. Use at your own risk.
+byte slice to string func String(b []byte) (s string) { if len(b) == 0 { return &amp;#34;&amp;#34; } return *(*string)(unsafe.</description>
+    </item>
+    
+    <item>
+      <title>Create a web framework in Go part 1: static routing</title>
       <link>https://duchoangmanh.github.io/posts/technical/create-a-web-framework-in-go/</link>
       <pubDate>Fri, 31 Dec 2021 23:24:26 +0700</pubDate>
       

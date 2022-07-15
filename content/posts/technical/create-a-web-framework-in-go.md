@@ -1,5 +1,5 @@
 ---
-title: "Create a web framework in Go part 1: static routing prototype"
+title: "Create a web framework in Go part 1: static routing"
 date: 2021-12-31T23:24:26+07:00
 tags: ["go", "framework", "english"]
 categories: ["technical"]

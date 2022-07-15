@@ -1,7 +1,7 @@
 ---
 title: "Go: Giới thiệu về Reflection qua ví dụ"
 date: 2022-07-13T00:01:23+07:00
-draft: false
+tags: ["go", "efective-go"]
 ---
 
 ## Reflection trong Go  
@@ -96,9 +96,9 @@ func TestParseQuery(t *testing.T) {
 	fmt.Println(d) // {Duc 10}
 }
 ```
-Một ví dụ khá cơ bản và thường gặp phải không? Tuy nhiên cách làm này sẽ cần phải lặp lại code khá nhiều.
-Vậy thay vì biết trước struct được truyền vào là `Person` thì ta có thể  truyền một struct bất kì với các field có tên ứng với các query có thể gặp mà vẫn đạt được kết quả tương tự hay không? Với reflect thì hoàn toàn có thể.
-Ý tưởng là ta có thể dùng reflect để đọc thông tin của struct bất kỳ được truyền vào, duyệt qua lần lượt các field, và kiểm tra xem trong URL có query nào tương ứng với field đang xét hay không, nếu có thì đọc giá trị của query vào field.
+Một ví dụ khá cơ bản và thường gặp phải không? Tuy nhiên cách làm này sẽ cần phải lặp lại code khá nhiều.  
+Vậy thay vì biết trước struct được truyền vào là `Person` thì ta có thể  truyền một struct bất kì với các field có tên ứng với các query có thể gặp mà vẫn đạt được kết quả tương tự hay không? Với reflect thì hoàn toàn có thể.  
+Ý tưởng là có thể dùng reflect để đọc thông tin của struct bất kỳ được truyền vào, duyệt qua lần lượt các field, và kiểm tra xem trong URL có query nào tương ứng với field đang xét hay không, nếu có thì đọc giá trị của query vào field.  
 ### Bắt tay vào code
 Tổng quan của chương trình có thể được thể hiện như sau:
 ```go
