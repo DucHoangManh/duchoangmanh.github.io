@@ -47,7 +47,7 @@ func SliceContains[T MyConstraint](ss []T, match T) bool {
 	return false
 }
 ```
-Như ví dụ trên đây, T cần là `int` hoặc `string`, toán tử `~` tức ràng buộc thỏa mản với cả các kiểu được định nghĩa từ `int` hoặc `string` (ví dụ `type Name string`, `type Age int`)
+Như ví dụ trên đây, T cần là `int` hoặc `string`, toán tử `~` tức ràng buộc thỏa mãn với cả các kiểu được định nghĩa từ `int` hoặc `string` (ví dụ `type Name string`, `type Age int`)
 ```go
 func TestSliceContains(t *testing.T) {
 	intSlice := []int{4, 5, 6}
