@@ -137,8 +137,8 @@ func New[T any](lessFunc func(T, T) bool) *Heap[T] {
 ```
 Type parameter cũng có thể sử dụng với `type` như trong ví dụ này.
 Mấu chốt trong cách triển khai này chính là lưu lại `lessFunc` trong struct `Heap`, do ta không thể thay đổi method `Less` tại runtime, thay vào đó `Less` sẽ gọi vào hàm được lưu trong receiver.  
-Tuy nhiên có thể thấy rằng kiểu của các method như `Push` hay `Pop` lại là `any` và để đảm bảo implement `heap.Interface`, ta không thể sửa signature của các method này.  
-Thay vào đó ta sẽ wrap type mà implement heap interface trong một public Type mà sẽ nhận và trả về kết quả mong muốn:  
+Tuy nhiên có thể thấy rằng kiểu của các method như `Push` hay `Pop` lại là `any` và để đảm bảo implement `heap.Interface`, ta không thể sửa signature của các method này. Ngoài ra, việc gọi trực tiếp `*Heap.Pop` thay vì `heap.Pop(*Heap)`, và `*Heap.Push(T)` thay vì `heap.Push(*Heap, T)` sẽ gây ra kết quả sai, thay vào đó nên tránh cho phép gọi trực tiếp các method này.     
+Ta sẽ wrap type mà implement heap interface trong một public Type mà sẽ nhận và trả về kết quả mong muốn:  
 Chuyển triển khai trên thành một unexported struct với tên `base`:
 ```go
 type base[T any] struct {
