@@ -82,7 +82,7 @@ params:
         - name: facebook
           url: "https://www.facebook.com/gelous3.mdh/"
         - name: linkedin
-          url: "https://www.linkedin.com/in/manh-duc-hoang-7a53b1205/"
+          url: "https://www.linkedin.com/in/duchm"
 
     editPost:
         URL: "https://github.com/adityatelange/hugo-PaperMod/tree/exampleSite/content"
