@@ -10,7 +10,7 @@
 <meta name="description" content="Posts - duchm">
 <meta name="author" content="Duc">
 <link rel="canonical" href="https://duchoangmanh.github.io/posts/">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.6a98292fb8fa8cf0f3ba4042d4b75515c04267550f3ad49ff6271b5af9562443.css" integrity="sha256-apgpL7j6jPDzukBC1LdVFcBCZ1UPOtSf9icbWvlWJEM=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.b609c58d5c11bb90b1a54e04005d74ad1ddf22165eb79f5533967e57df9c3b50.css" integrity="sha256-tgnFjVwRu5CxpU4EAF10rR3fIhZet59VM5Z&#43;V9&#43;cO1A=" rel="preload stylesheet" as="style">
 <link rel="icon" href="https://duchoangmanh.github.io/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="https://duchoangmanh.github.io/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="https://duchoangmanh.github.io/favicon-32x32.png">
@@ -36,7 +36,7 @@
                 --secondary: rgb(155, 156, 157);
                 --tertiary: rgb(65, 66, 68);
                 --content: rgb(196, 196, 197);
-                --hljs-bg: rgb(46, 46, 51);
+                --code-block-bg: rgb(46, 46, 51);
                 --code-bg: rgb(55, 56, 62);
                 --border: rgb(51, 51, 51);
             }
@@ -155,20 +155,20 @@
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2>Go: Exploring new loop semantics
+    <h2 class="entry-hint-parent">Go: Exploring new loop semantics
     </h2>
   </header>
   <div class="entry-content">
     <p>Go 1.22 has just been released with a bunch of new features and improvements. In this article, we will explore the new loop semantics and how they can be used to write more expressive and readable code.
 1. Loop variable is no longer be shared between iterations Previously, the loop variable was shared between iterations, from go 1.21 (experimental) and now with go 1.22, the loop variable is created anew with each iteration, effectively eliminating one of the most common foot gun in Go (for both experienced and new gophers)....</p>
   </div>
-  <footer class="entry-footer">&lt;span title=&#39;2024-02-15 20:40:05 &#43;0700 &#43;07&#39;&gt;February 15, 2024&lt;/span&gt;&amp;nbsp;·&amp;nbsp;5 min&amp;nbsp;·&amp;nbsp;Duc</footer>
+  <footer class="entry-footer"><span title='2024-02-15 20:40:05 +0700 +07'>February 15, 2024</span>&nbsp;·&nbsp;5 min&nbsp;·&nbsp;Duc</footer>
   <a class="entry-link" aria-label="post link to Go: Exploring new loop semantics" href="https://duchoangmanh.github.io/posts/technical/exploring-go-new-loop-semantics/"></a>
 </article>
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2>How to write integration tests with test container in Go
+    <h2 class="entry-hint-parent">How to write integration tests with test container in Go
     </h2>
   </header>
   <div class="entry-content">
@@ -176,13 +176,13 @@
 Let’s consider a small example program where I use postgres as the underlying database to store product records:
 create table product ( id serial8 not null primary key, name varchar(100) not null, type varchar(50) not null, code varchar(50) not null, price int4 not null ); The program can create, update and list products via a repository:...</p>
   </div>
-  <footer class="entry-footer">&lt;span title=&#39;2023-12-27 18:31:05 &#43;0700 &#43;07&#39;&gt;December 27, 2023&lt;/span&gt;&amp;nbsp;·&amp;nbsp;7 min&amp;nbsp;·&amp;nbsp;Duc</footer>
+  <footer class="entry-footer"><span title='2023-12-27 18:31:05 +0700 +07'>December 27, 2023</span>&nbsp;·&nbsp;7 min&nbsp;·&nbsp;Duc</footer>
   <a class="entry-link" aria-label="post link to How to write integration tests with test container in Go" href="https://duchoangmanh.github.io/posts/technical/testing-with-test-container-go/"></a>
 </article>
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2>Go: Giới thiệu về reflection qua ví dụ
+    <h2 class="entry-hint-parent">Go: Giới thiệu về reflection qua ví dụ
     </h2>
   </header>
   <div class="entry-content">
@@ -190,26 +190,26 @@ create table product ( id serial8 not null primary key, name varchar(100) not nu
 Reflection trong go có thể được thực hiện thông qua reflect package. Một số khả năng của reflect:
 Kiểm tra thông tin của một struct (số lượng method, số lượng field, đọc struct tag…) mà không cần biết trước về struct đó....</p>
   </div>
-  <footer class="entry-footer">&lt;span title=&#39;2022-07-13 00:01:23 &#43;0700 &#43;07&#39;&gt;July 13, 2022&lt;/span&gt;&amp;nbsp;·&amp;nbsp;10 min&amp;nbsp;·&amp;nbsp;Duc</footer>
+  <footer class="entry-footer"><span title='2022-07-13 00:01:23 +0700 +07'>July 13, 2022</span>&nbsp;·&nbsp;10 min&nbsp;·&nbsp;Duc</footer>
   <a class="entry-link" aria-label="post link to Go: Giới thiệu về reflection qua ví dụ" href="https://duchoangmanh.github.io/posts/technical/go-reflection-qua-vi-du/"></a>
 </article>
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2>Go: Giới thiệu về type parameter (generic) qua ví dụ
+    <h2 class="entry-hint-parent">Go: Giới thiệu về type parameter (generic) qua ví dụ
     </h2>
   </header>
   <div class="entry-content">
     <p>1. Kiểm tra sự xuất hiện của một phần tử trong slice Type parameter hay generic là một tính năng mới xuất hiện từ phiên bản 1.18 của Go. Với generic, ta có thể viết các hàm hoặc type có thể dùng được cho nhiều kiểu dữ liệu đầu vào khác nhau mà không cần phải lặp lại code nhiều lần.
 Hãy bắt đầu với một ví dụ đơn giản và phổ biến: Kiểm tra xem string có xuất hiện trong slice hay không...</p>
   </div>
-  <footer class="entry-footer">&lt;span title=&#39;2022-06-30 20:21:52 &#43;0700 &#43;07&#39;&gt;June 30, 2022&lt;/span&gt;&amp;nbsp;·&amp;nbsp;7 min&amp;nbsp;·&amp;nbsp;Duc</footer>
+  <footer class="entry-footer"><span title='2022-06-30 20:21:52 +0700 +07'>June 30, 2022</span>&nbsp;·&nbsp;7 min&nbsp;·&nbsp;Duc</footer>
   <a class="entry-link" aria-label="post link to Go: Giới thiệu về type parameter (generic) qua ví dụ" href="https://duchoangmanh.github.io/posts/technical/go-gioi-thieu-type-parameter-qua-vi-du/"></a>
 </article>
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2>Go tips and optimization notes
+    <h2 class="entry-hint-parent">Go tips and optimization notes
     </h2>
   </header>
   <div class="entry-content">
@@ -217,7 +217,7 @@ Hãy bắt đầu với một ví dụ đơn giản và phổ biến: Kiểm tra
 1. Efficiently converse between string and byte slice Gain some performance with the price of maintainability. Using the unsafe package is not advised but we can use it to efficiently converse between a string and byte slice. Use at your own risk.
 byte slice to string func String(b []byte) (s string) { if len(b) == 0 { return &#34;&#34; } return *(*string)(unsafe....</p>
   </div>
-  <footer class="entry-footer">&lt;span title=&#39;2022-06-14 13:31:06 &#43;0700 &#43;07&#39;&gt;June 14, 2022&lt;/span&gt;&amp;nbsp;·&amp;nbsp;4 min&amp;nbsp;·&amp;nbsp;Duc</footer>
+  <footer class="entry-footer"><span title='2022-06-14 13:31:06 +0700 +07'>June 14, 2022</span>&nbsp;·&nbsp;4 min&nbsp;·&nbsp;Duc</footer>
   <a class="entry-link" aria-label="post link to Go tips and optimization notes" href="https://duchoangmanh.github.io/posts/technical/go-tips-and-optimization-notes/"></a>
 </article>
 <footer class="page-footer">

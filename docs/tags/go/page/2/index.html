@@ -10,7 +10,7 @@
 <meta name="description" content="">
 <meta name="author" content="Duc">
 <link rel="canonical" href="https://duchoangmanh.github.io/tags/go/">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.6a98292fb8fa8cf0f3ba4042d4b75515c04267550f3ad49ff6271b5af9562443.css" integrity="sha256-apgpL7j6jPDzukBC1LdVFcBCZ1UPOtSf9icbWvlWJEM=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.b609c58d5c11bb90b1a54e04005d74ad1ddf22165eb79f5533967e57df9c3b50.css" integrity="sha256-tgnFjVwRu5CxpU4EAF10rR3fIhZet59VM5Z&#43;V9&#43;cO1A=" rel="preload stylesheet" as="style">
 <link rel="icon" href="https://duchoangmanh.github.io/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="https://duchoangmanh.github.io/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="https://duchoangmanh.github.io/favicon-32x32.png">
@@ -36,7 +36,7 @@
                 --secondary: rgb(155, 156, 157);
                 --tertiary: rgb(65, 66, 68);
                 --content: rgb(196, 196, 197);
-                --hljs-bg: rgb(46, 46, 51);
+                --code-block-bg: rgb(46, 46, 51);
                 --code-bg: rgb(55, 56, 62);
                 --border: rgb(51, 51, 51);
             }
@@ -140,7 +140,7 @@
 
 <article class="post-entry tag-entry"> 
   <header class="entry-header">
-    <h2>Create a web framework in Go part 1: static routing
+    <h2 class="entry-hint-parent">Create a web framework in Go part 1: static routing
     </h2>
   </header>
   <div class="entry-content">
@@ -148,20 +148,20 @@
 How standard net/http package handle request? First, let’s look at a sample written with net/http package:
 func main() { http.HandleFunc(&#34;/&#34;, handler) http.HandleFunc(&#34;/post&#34;, getAllPost) log.Fatal(http.ListenAndServe(&#34;localhost:8000&#34;, nil)) } func handler(w http.ResponseWriter, r *http.Request) { fmt.Fprintf(w, &#34;URL.Path = %q\n&#34;, r.URL.Path) } This piece of code binds two endpoints with the corresponding handler function, and starts a web server at port 8000, terminates the server if some errors are returned....</p>
   </div>
-  <footer class="entry-footer">&lt;span title=&#39;2021-12-31 23:24:26 &#43;0700 &#43;07&#39;&gt;December 31, 2021&lt;/span&gt;&amp;nbsp;·&amp;nbsp;5 min&amp;nbsp;·&amp;nbsp;Duc</footer>
+  <footer class="entry-footer"><span title='2021-12-31 23:24:26 +0700 +07'>December 31, 2021</span>&nbsp;·&nbsp;5 min&nbsp;·&nbsp;Duc</footer>
   <a class="entry-link" aria-label="post link to Create a web framework in Go part 1: static routing" href="https://duchoangmanh.github.io/posts/technical/create-a-web-framework-in-go/"></a>
 </article>
 
 <article class="post-entry tag-entry"> 
   <header class="entry-header">
-    <h2>Design pattern thân thiện trong go
+    <h2 class="entry-hint-parent">Design pattern thân thiện trong go
     </h2>
   </header>
   <div class="entry-content">
     <p>Tại sao lại có bài viết này?: Design pattern: Những giải pháp có thể tái sử dụng cho các vấn đề thường gặp tại một ngữ cảnh nhất định trong quá trinh thiết kế phần mềm.
 Bài viết này nói về một số Design pattern “thân thiện” hơn trong go, được mình tổng hợp dựa trên buổi talk của Ryan Djurovich (https://www.youtube.com/watch?v=HHqv3_rUr88) và một số nguồn tài liệu khác mà mình đọc được....</p>
   </div>
-  <footer class="entry-footer">&lt;span title=&#39;2021-12-26 22:14:29 &#43;0700 &#43;07&#39;&gt;December 26, 2021&lt;/span&gt;&amp;nbsp;·&amp;nbsp;5 min&amp;nbsp;·&amp;nbsp;Duc</footer>
+  <footer class="entry-footer"><span title='2021-12-26 22:14:29 +0700 +07'>December 26, 2021</span>&nbsp;·&nbsp;5 min&nbsp;·&nbsp;Duc</footer>
   <a class="entry-link" aria-label="post link to Design pattern thân thiện trong go" href="https://duchoangmanh.github.io/posts/technical/design-pattern-than-thien-trong-go/"></a>
 </article>
 <footer class="page-footer">
