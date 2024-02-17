@@ -5,11 +5,34 @@
     <link>https://duchoangmanh.github.io/tags/efective-go/</link>
     <description>Recent content in efective-go on duchm</description>
     <image>
+      <title>duchm</title>
       <url>https://duchoangmanh.github.io/papermod-cover.png</url>
       <link>https://duchoangmanh.github.io/papermod-cover.png</link>
     </image>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Wed, 13 Jul 2022 00:01:23 +0700</lastBuildDate><atom:link href="https://duchoangmanh.github.io/tags/efective-go/index.xml" rel="self" type="application/rss+xml" />
+    <language>en</language>
+    <lastBuildDate>Thu, 15 Feb 2024 20:40:05 +0700</lastBuildDate><atom:link href="https://duchoangmanh.github.io/tags/efective-go/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Go: Exploring new loop semantics</title>
+      <link>https://duchoangmanh.github.io/posts/technical/exploring-go-new-loop-semantics/</link>
+      <pubDate>Thu, 15 Feb 2024 20:40:05 +0700</pubDate>
+      
+      <guid>https://duchoangmanh.github.io/posts/technical/exploring-go-new-loop-semantics/</guid>
+      <description>Go 1.22 has just been released with a bunch of new features and improvements. In this article, we will explore the new loop semantics and how they can be used to write more expressive and readable code.
+1. Loop variable is no longer be shared between iterations Previously, the loop variable was shared between iterations, from go 1.21 (experimental) and now with go 1.22, the loop variable is created anew with each iteration, effectively eliminating one of the most common foot gun in Go (for both experienced and new gophers).</description>
+    </item>
+    
+    <item>
+      <title>How to write integration tests with test container in Go</title>
+      <link>https://duchoangmanh.github.io/posts/technical/testing-with-test-container-go/</link>
+      <pubDate>Wed, 27 Dec 2023 18:31:05 +0700</pubDate>
+      
+      <guid>https://duchoangmanh.github.io/posts/technical/testing-with-test-container-go/</guid>
+      <description>The significance of integration testing in assuring the reliability and seamless operation of software systems cannot be understated. This guide will help you get started with using containers for integration testing and learn how to set up and execute test cases effectively.
+Let&amp;rsquo;s consider a small example program where I use postgres as the underlying database to store product records:
+create table product ( id serial8 not null primary key, name varchar(100) not null, type varchar(50) not null, code varchar(50) not null, price int4 not null ); The program can create, update and list products via a repository:</description>
+    </item>
+    
     <item>
       <title>Go: Giới thiệu về reflection qua ví dụ</title>
       <link>https://duchoangmanh.github.io/posts/technical/go-reflection-qua-vi-du/</link>
@@ -18,7 +41,7 @@
       <guid>https://duchoangmanh.github.io/posts/technical/go-reflection-qua-vi-du/</guid>
       <description>Reflection trong Go Reflection trong go giúp cho ta có thể theo dõi code tại thời điểm runtime, cho phép tiếp cận mã nguồn chương trình dưới dạng data có thể xử lý thay vì các lệnh có thể thực thi (một nhánh trong metaprogramming).
 Reflection trong go có thể được thực hiện thông qua reflect package. Một số khả năng của reflect:
- Kiểm tra thông tin của một struct (số lượng method, số lượng field, đọc struct tag&amp;hellip;) mà không cần biết trước về struct đó.</description>
+Kiểm tra thông tin của một struct (số lượng method, số lượng field, đọc struct tag&amp;hellip;) mà không cần biết trước về struct đó.</description>
     </item>
     
     <item>

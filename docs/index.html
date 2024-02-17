@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" dir="auto">
 
-<head><meta charset="utf-8">
+<head>
+	<meta name="generator" content="Hugo 0.122.0"><meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="robots" content="index, follow">
@@ -9,8 +10,8 @@
 
 <meta name="description" content="">
 <meta name="author" content="Duc">
-<link rel="canonical" href="https://duchoangmanh.github.io/" />
-<link crossorigin="anonymous" href="/assets/css/stylesheet.min.c88963fe2d79462000fd0fb1b3737783c32855d340583e4523343f8735c787f0.css" integrity="sha256-yIlj/i15RiAA/Q&#43;xs3N3g8MoVdNAWD5FIzQ/hzXHh/A=" rel="preload stylesheet" as="style">
+<link rel="canonical" href="https://duchoangmanh.github.io/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.6a98292fb8fa8cf0f3ba4042d4b75515c04267550f3ad49ff6271b5af9562443.css" integrity="sha256-apgpL7j6jPDzukBC1LdVFcBCZ1UPOtSf9icbWvlWJEM=" rel="preload stylesheet" as="style">
 <link rel="icon" href="https://duchoangmanh.github.io/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="https://duchoangmanh.github.io/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="https://duchoangmanh.github.io/favicon-32x32.png">
@@ -18,7 +19,6 @@
 <link rel="mask-icon" href="https://duchoangmanh.github.io/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<meta name="generator" content="Hugo 0.91.2" />
 <link rel="alternate" type="application/rss+xml" href="https://duchoangmanh.github.io/index.xml">
 <link rel="alternate" type="application/json" href="https://duchoangmanh.github.io/index.json">
 <noscript>
@@ -99,14 +99,14 @@
     <nav class="nav">
         <div class="logo">
             <a href="https://duchoangmanh.github.io/" accesskey="h" title="duchm (Alt + H)">duchm</a>
-            <span class="logo-switches">
+            <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
-                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                         stroke-linejoin="round">
                         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                     </svg>
-                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                         stroke-linejoin="round">
                         <circle cx="12" cy="12" r="5"></circle>
@@ -120,7 +120,7 @@
                         <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
                     </svg>
                 </button>
-            </span>
+            </div>
         </div>
         <ul id="menu">
             <li>
@@ -151,9 +151,9 @@
     <header class="entry-header">
         <h1>Pursuit of mediocrity</h1>
     </header>
-    <section class="entry-content">
-        <p>technical notes 🌟.</p>
-    </section>
+    <div class="entry-content">
+        technical notes 🌟.
+    </div>
     <footer class="entry-footer">
         <div class="social-icons">
     <a href="https://github.com/DucHoangManh" target="_blank" rel="noopener noreferrer me" title="Github">
@@ -185,15 +185,42 @@
 
 <article class="post-entry"> 
   <header class="entry-header">
+    <h2>Go: Exploring new loop semantics
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>Go 1.22 has just been released with a bunch of new features and improvements. In this article, we will explore the new loop semantics and how they can be used to write more expressive and readable code.
+1. Loop variable is no longer be shared between iterations Previously, the loop variable was shared between iterations, from go 1.21 (experimental) and now with go 1.22, the loop variable is created anew with each iteration, effectively eliminating one of the most common foot gun in Go (for both experienced and new gophers)....</p>
+  </div>
+  <footer class="entry-footer">&lt;span title=&#39;2024-02-15 20:40:05 &#43;0700 &#43;07&#39;&gt;February 15, 2024&lt;/span&gt;&amp;nbsp;·&amp;nbsp;5 min&amp;nbsp;·&amp;nbsp;Duc</footer>
+  <a class="entry-link" aria-label="post link to Go: Exploring new loop semantics" href="https://duchoangmanh.github.io/posts/technical/exploring-go-new-loop-semantics/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2>How to write integration tests with test container in Go
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>The significance of integration testing in assuring the reliability and seamless operation of software systems cannot be understated. This guide will help you get started with using containers for integration testing and learn how to set up and execute test cases effectively.
+Let’s consider a small example program where I use postgres as the underlying database to store product records:
+create table product ( id serial8 not null primary key, name varchar(100) not null, type varchar(50) not null, code varchar(50) not null, price int4 not null ); The program can create, update and list products via a repository:...</p>
+  </div>
+  <footer class="entry-footer">&lt;span title=&#39;2023-12-27 18:31:05 &#43;0700 &#43;07&#39;&gt;December 27, 2023&lt;/span&gt;&amp;nbsp;·&amp;nbsp;7 min&amp;nbsp;·&amp;nbsp;Duc</footer>
+  <a class="entry-link" aria-label="post link to How to write integration tests with test container in Go" href="https://duchoangmanh.github.io/posts/technical/testing-with-test-container-go/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
     <h2>Go: Giới thiệu về reflection qua ví dụ
     </h2>
   </header>
-  <section class="entry-content">
+  <div class="entry-content">
     <p>Reflection trong Go Reflection trong go giúp cho ta có thể theo dõi code tại thời điểm runtime, cho phép tiếp cận mã nguồn chương trình dưới dạng data có thể xử lý thay vì các lệnh có thể thực thi (một nhánh trong metaprogramming).
 Reflection trong go có thể được thực hiện thông qua reflect package. Một số khả năng của reflect:
- Kiểm tra thông tin của một struct (số lượng method, số lượng field, đọc struct tag…) mà không cần biết trước về struct đó....</p>
-  </section>
-  <footer class="entry-footer"><span title='2022-07-13 00:01:23 +0700 +07'>July 13, 2022</span>&nbsp;·&nbsp;10 min&nbsp;·&nbsp;Duc</footer>
+Kiểm tra thông tin của một struct (số lượng method, số lượng field, đọc struct tag…) mà không cần biết trước về struct đó....</p>
+  </div>
+  <footer class="entry-footer">&lt;span title=&#39;2022-07-13 00:01:23 &#43;0700 &#43;07&#39;&gt;July 13, 2022&lt;/span&gt;&amp;nbsp;·&amp;nbsp;10 min&amp;nbsp;·&amp;nbsp;Duc</footer>
   <a class="entry-link" aria-label="post link to Go: Giới thiệu về reflection qua ví dụ" href="https://duchoangmanh.github.io/posts/technical/go-reflection-qua-vi-du/"></a>
 </article>
 
@@ -202,11 +229,11 @@ Reflection trong go có thể được thực hiện thông qua reflect package.
     <h2>Go: Giới thiệu về type parameter (generic) qua ví dụ
     </h2>
   </header>
-  <section class="entry-content">
+  <div class="entry-content">
     <p>1. Kiểm tra sự xuất hiện của một phần tử trong slice Type parameter hay generic là một tính năng mới xuất hiện từ phiên bản 1.18 của Go. Với generic, ta có thể viết các hàm hoặc type có thể dùng được cho nhiều kiểu dữ liệu đầu vào khác nhau mà không cần phải lặp lại code nhiều lần.
 Hãy bắt đầu với một ví dụ đơn giản và phổ biến: Kiểm tra xem string có xuất hiện trong slice hay không...</p>
-  </section>
-  <footer class="entry-footer"><span title='2022-06-30 20:21:52 +0700 +07'>June 30, 2022</span>&nbsp;·&nbsp;7 min&nbsp;·&nbsp;Duc</footer>
+  </div>
+  <footer class="entry-footer">&lt;span title=&#39;2022-06-30 20:21:52 &#43;0700 &#43;07&#39;&gt;June 30, 2022&lt;/span&gt;&amp;nbsp;·&amp;nbsp;7 min&amp;nbsp;·&amp;nbsp;Duc</footer>
   <a class="entry-link" aria-label="post link to Go: Giới thiệu về type parameter (generic) qua ví dụ" href="https://duchoangmanh.github.io/posts/technical/go-gioi-thieu-type-parameter-qua-vi-du/"></a>
 </article>
 
@@ -215,49 +242,28 @@ Hãy bắt đầu với một ví dụ đơn giản và phổ biến: Kiểm tra
     <h2>Go tips and optimization notes
     </h2>
   </header>
-  <section class="entry-content">
+  <div class="entry-content">
     <p>Some Go tips (maybe some dark side too) and notes for writing better code.
 1. Efficiently converse between string and byte slice Gain some performance with the price of maintainability. Using the unsafe package is not advised but we can use it to efficiently converse between a string and byte slice. Use at your own risk.
 byte slice to string func String(b []byte) (s string) { if len(b) == 0 { return &#34;&#34; } return *(*string)(unsafe....</p>
-  </section>
-  <footer class="entry-footer"><span title='2022-06-14 13:31:06 +0700 +07'>June 14, 2022</span>&nbsp;·&nbsp;4 min&nbsp;·&nbsp;Duc</footer>
+  </div>
+  <footer class="entry-footer">&lt;span title=&#39;2022-06-14 13:31:06 &#43;0700 &#43;07&#39;&gt;June 14, 2022&lt;/span&gt;&amp;nbsp;·&amp;nbsp;4 min&amp;nbsp;·&amp;nbsp;Duc</footer>
   <a class="entry-link" aria-label="post link to Go tips and optimization notes" href="https://duchoangmanh.github.io/posts/technical/go-tips-and-optimization-notes/"></a>
 </article>
-
-<article class="post-entry"> 
-  <header class="entry-header">
-    <h2>Create a web framework in Go part 1: static routing
-    </h2>
-  </header>
-  <section class="entry-content">
-    <p>This post contains my notes while implement caneweb - a gin-like minimal web framework/router after reading the first section of 7 days golang by geektutu (https://github.com/geektutu/7days-golang).
-How standard net/http package handle request? First, let’s look at a sample written with net/http package:
-func main() { http.HandleFunc(&#34;/&#34;, handler) http.HandleFunc(&#34;/post&#34;, getAllPost) log.Fatal(http.ListenAndServe(&#34;localhost:8000&#34;, nil)) } func handler(w http.ResponseWriter, r *http.Request) { fmt.Fprintf(w, &#34;URL.Path = %q\n&#34;, r.URL.Path) } This piece of code binds two endpoints with the corresponding handler function, and starts a web server at port 8000, terminates the server if some errors are returned....</p>
-  </section>
-  <footer class="entry-footer"><span title='2021-12-31 23:24:26 +0700 +07'>December 31, 2021</span>&nbsp;·&nbsp;5 min&nbsp;·&nbsp;Duc</footer>
-  <a class="entry-link" aria-label="post link to Create a web framework in Go part 1: static routing" href="https://duchoangmanh.github.io/posts/technical/create-a-web-framework-in-go/"></a>
-</article>
-
-<article class="post-entry"> 
-  <header class="entry-header">
-    <h2>Design pattern thân thiện trong go
-    </h2>
-  </header>
-  <section class="entry-content">
-    <p>Tại sao lại có bài viết này?: Design pattern: Những giải pháp có thể tái sử dụng cho các vấn đề thường gặp tại một ngữ cảnh nhất định trong quá trinh thiết kế phần mềm.
-Bài viết này nói về một số Design pattern “thân thiện” hơn trong go, được mình tổng hợp dựa trên buổi talk của Ryan Djurovich (https://www.youtube.com/watch?v=HHqv3_rUr88) và một số nguồn tài liệu khác mà mình đọc được....</p>
-  </section>
-  <footer class="entry-footer"><span title='2021-12-26 22:14:29 +0700 +07'>December 26, 2021</span>&nbsp;·&nbsp;5 min&nbsp;·&nbsp;Duc</footer>
-  <a class="entry-link" aria-label="post link to Design pattern thân thiện trong go" href="https://duchoangmanh.github.io/posts/technical/design-pattern-than-thien-trong-go/"></a>
-</article>
+<footer class="page-footer">
+  <nav class="pagination">
+    <a class="next" href="https://duchoangmanh.github.io/page/2/">Next&nbsp;&nbsp;»
+    </a>
+  </nav>
+</footer>
     </main>
     
 <footer class="footer">
-    <span>&copy; 2022 <a href="https://duchoangmanh.github.io/">duchm</a></span>
+    <span>&copy; 2024 <a href="https://duchoangmanh.github.io/">duchm</a></span>
     <span>
         Powered by
         <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
-        <a href="https://git.io/hugopapermod" rel="noopener" target="_blank">PaperMod</a>
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
     </span>
 </footer>
 <a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">

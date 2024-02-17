@@ -6,13 +6,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="robots" content="index, follow">
 <title>Design pattern thân thiện trong go | duchm</title>
-<meta name="keywords" content="go, design pattern, efective-go" />
+<meta name="keywords" content="go, design pattern, efective-go">
 <meta name="description" content="Tại sao lại có bài viết này?: Design pattern: Những giải pháp có thể tái sử dụng cho các vấn đề thường gặp tại một ngữ cảnh nhất định trong quá trinh thiết kế phần mềm.
 Bài viết này nói về một số Design pattern &ldquo;thân thiện&rdquo; hơn trong go, được mình tổng hợp dựa trên buổi talk của Ryan Djurovich (https://www.youtube.com/watch?v=HHqv3_rUr88) và một số nguồn tài liệu khác mà mình đọc được.">
 <meta name="author" content="Duc">
-<link rel="canonical" href="https://duchoangmanh.github.io/posts/technical/design-pattern-than-thien-trong-go/" />
-<link crossorigin="anonymous" href="/assets/css/stylesheet.min.c88963fe2d79462000fd0fb1b3737783c32855d340583e4523343f8735c787f0.css" integrity="sha256-yIlj/i15RiAA/Q&#43;xs3N3g8MoVdNAWD5FIzQ/hzXHh/A=" rel="preload stylesheet" as="style">
-<script defer crossorigin="anonymous" src="/assets/js/highlight.min.7680afc38aa6b15ddf158a4f3780b7b1f7dde7e91d26f073e6229bb7a0793c92.js" integrity="sha256-doCvw4qmsV3fFYpPN4C3sffd5&#43;kdJvBz5iKbt6B5PJI="
+<link rel="canonical" href="https://duchoangmanh.github.io/posts/technical/design-pattern-than-thien-trong-go/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.6a98292fb8fa8cf0f3ba4042d4b75515c04267550f3ad49ff6271b5af9562443.css" integrity="sha256-apgpL7j6jPDzukBC1LdVFcBCZ1UPOtSf9icbWvlWJEM=" rel="preload stylesheet" as="style">
+<script defer crossorigin="anonymous" src="/assets/js/highlight.f413e19d0714851f6474e7ee9632408e58ac146fbdbe62747134bea2fa3415e0.js" integrity="sha256-9BPhnQcUhR9kdOfuljJAjlisFG&#43;9vmJ0cTS&#43;ovo0FeA="
     onload="hljs.initHighlightingOnLoad();"></script>
 <link rel="icon" href="https://duchoangmanh.github.io/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="https://duchoangmanh.github.io/favicon-16x16.png">
@@ -21,7 +21,6 @@ Bài viết này nói về một số Design pattern &ldquo;thân thiện&rdquo;
 <link rel="mask-icon" href="https://duchoangmanh.github.io/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<meta name="generator" content="Hugo 0.91.2" />
 <noscript>
     <style>
         #theme-toggle,
@@ -63,8 +62,8 @@ Bài viết này nói về một số Design pattern &ldquo;thân thiện&rdquo;
 Bài viết này nói về một số Design pattern &ldquo;thân thiện&rdquo; hơn trong go, được mình tổng hợp dựa trên buổi talk của Ryan Djurovich (https://www.youtube.com/watch?v=HHqv3_rUr88) và một số nguồn tài liệu khác mà mình đọc được." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://duchoangmanh.github.io/posts/technical/design-pattern-than-thien-trong-go/" /><meta property="og:image" content="https://duchoangmanh.github.io/papermod-cover.png"/><meta property="article:section" content="posts" />
-<meta property="article:published_time" content="2021-12-26T22:14:29&#43;07:00" />
-<meta property="article:modified_time" content="2021-12-26T22:14:29&#43;07:00" />
+<meta property="article:published_time" content="2021-12-26T22:14:29+07:00" />
+<meta property="article:modified_time" content="2021-12-26T22:14:29+07:00" />
 
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="https://duchoangmanh.github.io/papermod-cover.png"/>
@@ -104,7 +103,7 @@ Bài viết này nói về một số Design pattern &ldquo;thân thiện&rdquo;
   "keywords": [
     "go", "design pattern", "efective-go"
   ],
-  "articleBody": "Tại sao lại có bài viết này?: Design pattern: Những giải pháp có thể tái sử dụng cho các vấn đề thường gặp tại một ngữ cảnh nhất định trong quá trinh thiết kế phần mềm.\nBài viết này nói về một số Design pattern “thân thiện” hơn trong go, được mình tổng hợp dựa trên buổi talk của Ryan Djurovich (https://www.youtube.com/watch?v=HHqv3_rUr88) và một số nguồn tài liệu khác mà mình đọc được.\nFactory pattern Khỏi phải nói về độ phổ biến của nó rồi, rất hữu ích khi cần phải khởi tạo một đối tượng có nhiều triển khai (concrete types), phía client chỉ cần quan tâm đến các method, Factory sẽ lo việc lựa chọn triển khai nào sẽ được dùng để xử lý dữ liệu.\n// use Stringer as the interface  type ErrPrint struct{} func (p *ErrPrint) String() string { return \"some error happens\" } type InfoPrint struct{} func (p *InfoPrint) String() string { return \"nothing dramatically happens\" } func NewPrinter(kind string) (result fmt.Stringer, err error) { switch kind { case \"error\": result = \u0026ErrPrint{} case \"info\": result = \u0026InfoPrint{} default: err = errors.New(\"invalid kind\") } return } Decorator (Functional option) Để nói về pattern này, đầu tiên hãy xem ví dụ bên dưới:\nfunc runServer() { http.HandleFunc(\"/\", helloEndpoint) log.Fatal(http.ListenAndServe(\":8080\", nil)) } func helloEndpoint(w http.ResponseWriter, r *http.Request) { fmt.Fprintf(w, \"Hello world\") } Đoạn code trên tạo ra một web server đơn giản với net/http package với một endpoint duy nhất. Bài toán được đặt ra là bây giờ cần log lại thời gian cần để hoàn tất xử lý request. Để gia tăng tính tái sử dụng, tránh phải sửa lại handler, cũng như dễ dàng bảo trì về sau, ta có thể viết như sau:\nfunc runServer() { http.HandleFunc(\"/\", durationLogger(helloEndpoint)) log.Fatal(http.ListenAndServe(\":8080\", nil)) } func helloEndpoint(w http.ResponseWriter, r *http.Request) { fmt.Fprintf(w, \"Hello world\") } func durationLogger(f http.HandlerFunc) http.HandlerFunc { return func(writer http.ResponseWriter, request *http.Request) { startTime := time.Now() f(writer, request) log.Printf(\"complete handle request after %s ms\", time.Since(startTime).Milliseconds()) } } Như vậy, chúng ta có thể dễ dàng thêm tính năng log thời gian này vào những handler cần thiết, việc thay đổi nội dung log cũng trở nên dễ dàng hơn. Đây chỉ là một ví dụ đơn giản về middleware, trong thực tế việc triển khai có thể phức tạp hơn để phù hợp với các nhù cầu khác nhau.\nIterator Tại sao lại cần pattern này thay vì duyệt (array, slice, map, channel…) trong go?\n Có thể kết hợp với decorator Khi viết một module nào đó mà muốn che giấu triển khai bên dưới, chỉ cho phép phía sử dụng duyệt tuần tự các phần tử. Ví dụ io.Reader, sql/database.Row  type Iterator struct { tasks []string position int } // Next will return the next task in the slice // if there's more data to iterate, more will be true func (t *Iterator) Next() (pos int, val string, more bool) { t.position++ if t.position  len(t.tasks) { return t.position, \"\", false } return t.position, t.tasks[t.position-1], true } Trên đây là một ví dụ đơn giản về triển khai iterator trong go\nfor _, val, more := i.Next(); more; _, val, more = i.Next() { fmt.Println(val) } Dependency Injection DI trong go có thể được triển khai theo nhiều cách, có cả những thư viện chuyên dùng để DI trong go (google/wire, uber-go/fx), trong bài viết này sẽ chỉ nói vể cách triển khai đơn giản nhất\n┌────────────────────┬──────────┬────────────────────────────────┬────────┐ │ Client package │ Client ├─────►  │ │ │ └──────────┘ │ Client Service Interface │ │ │ └─────▲────────────────────┘ │ │ │ │ ├───────────────────────────────────────────┼─────────────────────────────┤ ├───────────────────────────┼───────────────|─────┼─┼──────────────────┼──┤ │ Service package │ Concrete Service 1 │ │Concrete Service 2│ │ │ └─────────────────────┘ └──────────────────┘ │ │ │ │ │ └─────────────────────────────────────────────────────────────────────────┘ Đây là một đoạn code ví dụ co dependency injection sử dụng constructor\nfunc main() { s := NewMyService(os.Stderr) s.WriteHello(\"world\") } type MyService struct { writer io.Writer } func NewMyService(writer io.Writer) MyService { return MyService{ writer: writer, } } func (s *MyService) WriteHello(m string) { fmt.Fprintf(s.writer, \"Hello %s\\n\", m) } Thêm method để có thể sử dụng setter injection:\nfunc (s *MyService) SetWriter(w io.Writer) { s.writer = w } So sánh hai cách:\n constructor: Đảm bảo dependency được sử dụng luôn valid setter: Có thể thay thế concrete service trong quá trình chạy chương trình(runtime)  Repository Một pattern trong thiết kế phần mếm hướng tới việc tiến hóa lâu dài của ứng dụng, các module phụ thuộc có thể được thay đổi trong tương lai. Ví dụ dưới đề thể hiện việc triển khai một ứng dụng mà lớp storage có thể được thay đổi: package post - khai báo model\ntype Post struct { ID int64 Title string } package domain - khai báo các interface client sử dụng để thao tác với storage\n// Repository must be implemented by all implementations of Post storage type Repository interface { FindAll() ([]post.Post, error) Store(post post.Post) (post.Post, error) DeleteById(postId int64) error } package memstorage - một triển khai của storage\n//in-memory implementation type PostStorage struct { posts map[int64]string highestID int64 } func (p *PostStorage) FindAll() ([]post.Post, error) { result := make([]post.Post, 0) for id, title := range p.posts { result = append(result, post.Post{ ID: id, Title: title, }) } return result, nil } func (p *PostStorage) Store(post post.Post) (post.Post, error) { if p.posts == nil { p.posts = make(map[int64]string) } if post.ID  0 { p.highestID++ post.ID = p.highestID } else { if _, exists := p.posts[post.ID]; !exists { return post, fmt.Errorf(\"post already exist\") } } p.posts[post.ID] = post.Title return post, nil } func (p *PostStorage) DeleteById(postId int64) error { delete(p.posts, postId) return nil } Sử dụng repository package: package main\nfunc main() { postRepo := memstorage.PostStorage{} //may change to other implementation in the future \tnewPost, err := postRepo.Store(post.Post{ Title: \"Eagles fly\", }) if err != nil { log.Println(\"can not create post\", err) } else { log.Printf(\"created post with id %d\", newPost.ID) } posts, err := postRepo.FindAll() if err != nil { log.Println(\"can not fetch posts\", err) } else { log.Println(posts) } } Bằng cách chia nhỏ việc triển khai, domain interface và model, trong trường hợp một phần mềm cần thay thế các module trong tương lai, có thể update một cách dễ dàng.\nMã nguồn trong bài viết có thể xem tại: https://github.com/DucHoangManh/go-patterns\n",
+  "articleBody": "Tại sao lại có bài viết này?: Design pattern: Những giải pháp có thể tái sử dụng cho các vấn đề thường gặp tại một ngữ cảnh nhất định trong quá trinh thiết kế phần mềm.\nBài viết này nói về một số Design pattern “thân thiện” hơn trong go, được mình tổng hợp dựa trên buổi talk của Ryan Djurovich (https://www.youtube.com/watch?v=HHqv3_rUr88) và một số nguồn tài liệu khác mà mình đọc được.\nFactory pattern Khỏi phải nói về độ phổ biến của nó rồi, rất hữu ích khi cần phải khởi tạo một đối tượng có nhiều triển khai (concrete types), phía client chỉ cần quan tâm đến các method, Factory sẽ lo việc lựa chọn triển khai nào sẽ được dùng để xử lý dữ liệu.\n// use Stringer as the interface type ErrPrint struct{} func (p *ErrPrint) String() string { return \"some error happens\" } type InfoPrint struct{} func (p *InfoPrint) String() string { return \"nothing dramatically happens\" } func NewPrinter(kind string) (result fmt.Stringer, err error) { switch kind { case \"error\": result = \u0026ErrPrint{} case \"info\": result = \u0026InfoPrint{} default: err = errors.New(\"invalid kind\") } return } Decorator (Functional option) Để nói về pattern này, đầu tiên hãy xem ví dụ bên dưới:\nfunc runServer() { http.HandleFunc(\"/\", helloEndpoint) log.Fatal(http.ListenAndServe(\":8080\", nil)) } func helloEndpoint(w http.ResponseWriter, r *http.Request) { fmt.Fprintf(w, \"Hello world\") } Đoạn code trên tạo ra một web server đơn giản với net/http package với một endpoint duy nhất. Bài toán được đặt ra là bây giờ cần log lại thời gian cần để hoàn tất xử lý request. Để gia tăng tính tái sử dụng, tránh phải sửa lại handler, cũng như dễ dàng bảo trì về sau, ta có thể viết như sau:\nfunc runServer() { http.HandleFunc(\"/\", durationLogger(helloEndpoint)) log.Fatal(http.ListenAndServe(\":8080\", nil)) } func helloEndpoint(w http.ResponseWriter, r *http.Request) { fmt.Fprintf(w, \"Hello world\") } func durationLogger(f http.HandlerFunc) http.HandlerFunc { return func(writer http.ResponseWriter, request *http.Request) { startTime := time.Now() f(writer, request) log.Printf(\"complete handle request after %s ms\", time.Since(startTime).Milliseconds()) } } Như vậy, chúng ta có thể dễ dàng thêm tính năng log thời gian này vào những handler cần thiết, việc thay đổi nội dung log cũng trở nên dễ dàng hơn. Đây chỉ là một ví dụ đơn giản về middleware, trong thực tế việc triển khai có thể phức tạp hơn để phù hợp với các nhù cầu khác nhau.\nIterator Tại sao lại cần pattern này thay vì duyệt (array, slice, map, channel…) trong go?\nCó thể kết hợp với decorator Khi viết một module nào đó mà muốn che giấu triển khai bên dưới, chỉ cho phép phía sử dụng duyệt tuần tự các phần tử. Ví dụ io.Reader, sql/database.Row type Iterator struct { tasks []string position int } // Next will return the next task in the slice // if there's more data to iterate, more will be true func (t *Iterator) Next() (pos int, val string, more bool) { t.position++ if t.position \u003e len(t.tasks) { return t.position, \"\", false } return t.position, t.tasks[t.position-1], true } Trên đây là một ví dụ đơn giản về triển khai iterator trong go\nfor _, val, more := i.Next(); more; _, val, more = i.Next() { fmt.Println(val) } Dependency Injection DI trong go có thể được triển khai theo nhiều cách, có cả những thư viện chuyên dùng để DI trong go (google/wire, uber-go/fx), trong bài viết này sẽ chỉ nói vể cách triển khai đơn giản nhất\n┌────────────────────┬──────────┬────────────────────────────────┬────────┐ │ Client package │ Client ├─────► \u003c\u003e │ │ │ └──────────┘ │ Client Service Interface │ │ │ └─────▲────────────────────┘ │ │ │ │ ├───────────────────────────────────────────┼─────────────────────────────┤ ├───────────────────────────┼───────────────|─────┼─┼──────────────────┼──┤ │ Service package │ Concrete Service 1 │ │Concrete Service 2│ │ │ └─────────────────────┘ └──────────────────┘ │ │ │ │ │ └─────────────────────────────────────────────────────────────────────────┘ Đây là một đoạn code ví dụ co dependency injection sử dụng constructor\nfunc main() { s := NewMyService(os.Stderr) s.WriteHello(\"world\") } type MyService struct { writer io.Writer } func NewMyService(writer io.Writer) MyService { return MyService{ writer: writer, } } func (s *MyService) WriteHello(m string) { fmt.Fprintf(s.writer, \"Hello %s\\n\", m) } Thêm method để có thể sử dụng setter injection:\nfunc (s *MyService) SetWriter(w io.Writer) { s.writer = w } So sánh hai cách:\nconstructor: Đảm bảo dependency được sử dụng luôn valid setter: Có thể thay thế concrete service trong quá trình chạy chương trình(runtime) Repository Một pattern trong thiết kế phần mếm hướng tới việc tiến hóa lâu dài của ứng dụng, các module phụ thuộc có thể được thay đổi trong tương lai. Ví dụ dưới đề thể hiện việc triển khai một ứng dụng mà lớp storage có thể được thay đổi: package post - khai báo model\ntype Post struct { ID int64 Title string } package domain - khai báo các interface client sử dụng để thao tác với storage\n// Repository must be implemented by all implementations of Post storage type Repository interface { FindAll() ([]post.Post, error) Store(post post.Post) (post.Post, error) DeleteById(postId int64) error } package memstorage - một triển khai của storage\n//in-memory implementation type PostStorage struct { posts map[int64]string highestID int64 } func (p *PostStorage) FindAll() ([]post.Post, error) { result := make([]post.Post, 0) for id, title := range p.posts { result = append(result, post.Post{ ID: id, Title: title, }) } return result, nil } func (p *PostStorage) Store(post post.Post) (post.Post, error) { if p.posts == nil { p.posts = make(map[int64]string) } if post.ID \u003c= 0 { p.highestID++ post.ID = p.highestID } else { if _, exists := p.posts[post.ID]; !exists { return post, fmt.Errorf(\"post already exist\") } } p.posts[post.ID] = post.Title return post, nil } func (p *PostStorage) DeleteById(postId int64) error { delete(p.posts, postId) return nil } Sử dụng repository package: package main\nfunc main() { postRepo := memstorage.PostStorage{} //may change to other implementation in the future newPost, err := postRepo.Store(post.Post{ Title: \"Eagles fly\", }) if err != nil { log.Println(\"can not create post\", err) } else { log.Printf(\"created post with id %d\", newPost.ID) } posts, err := postRepo.FindAll() if err != nil { log.Println(\"can not fetch posts\", err) } else { log.Println(posts) } } Bằng cách chia nhỏ việc triển khai, domain interface và model, trong trường hợp một phần mềm cần thay thế các module trong tương lai, có thể update một cách dễ dàng.\nMã nguồn trong bài viết có thể xem tại: https://github.com/DucHoangManh/go-patterns\n",
   "wordCount" : "1043",
   "inLanguage": "en",
   "datePublished": "2021-12-26T22:14:29+07:00",
@@ -145,14 +144,14 @@ Bài viết này nói về một số Design pattern &ldquo;thân thiện&rdquo;
     <nav class="nav">
         <div class="logo">
             <a href="https://duchoangmanh.github.io/" accesskey="h" title="duchm (Alt + H)">duchm</a>
-            <span class="logo-switches">
+            <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
-                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                         stroke-linejoin="round">
                         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                     </svg>
-                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                         stroke-linejoin="round">
                         <circle cx="12" cy="12" r="5"></circle>
@@ -166,7 +165,7 @@ Bài viết này nói về một số Design pattern &ldquo;thân thiện&rdquo;
                         <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
                     </svg>
                 </button>
-            </span>
+            </div>
         </div>
         <ul id="menu">
             <li>
@@ -200,7 +199,7 @@ Bài viết này nói về một số Design pattern &ldquo;thân thiện&rdquo;
     <h1 class="post-title">
       Design pattern thân thiện trong go
     </h1>
-    <div class="post-meta"><span title='2021-12-26 22:14:29 +0700 +07'>December 26, 2021</span>&nbsp;·&nbsp;5 min&nbsp;·&nbsp;Duc&nbsp;|&nbsp;<a href="https://github.com/adityatelange/hugo-PaperMod/tree/exampleSite/content/posts/technical/design-pattern-than-thien-trong-go.md" rel="noopener noreferrer" target="_blank">Suggest Changes</a>
+    <div class="post-meta">&lt;span title=&#39;2021-12-26 22:14:29 &#43;0700 &#43;07&#39;&gt;December 26, 2021&lt;/span&gt;&amp;nbsp;·&amp;nbsp;5 min&amp;nbsp;·&amp;nbsp;Duc&nbsp;|&nbsp;<a href="https://github.com/adityatelange/hugo-PaperMod/tree/exampleSite/content/posts/technical/design-pattern-than-thien-trong-go.md" rel="noopener noreferrer" target="_blank">Suggest Changes</a>
 
 </div>
   </header> <div class="toc">
@@ -234,59 +233,59 @@ Bài viết này nói về một số Design pattern &ldquo;thân thiện&rdquo;
 <p>Bài viết này nói về một số  Design pattern &ldquo;thân thiện&rdquo; hơn trong go, được mình tổng hợp dựa trên buổi talk của Ryan Djurovich (<a href="https://www.youtube.com/watch?v=HHqv3_rUr88">https://www.youtube.com/watch?v=HHqv3_rUr88</a>) và một số nguồn tài liệu khác mà mình đọc được.</p>
 <h2 id="factory-pattern">Factory pattern<a hidden class="anchor" aria-hidden="true" href="#factory-pattern">#</a></h2>
 <p>Khỏi phải nói về độ phổ biến của nó rồi, rất hữu ích khi cần phải khởi tạo một đối tượng có nhiều triển khai (concrete types), phía client chỉ cần quan tâm đến các method, Factory sẽ lo việc lựa chọn triển khai nào sẽ được dùng để xử lý dữ liệu.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#75715e">// use Stringer as the interface
-</span><span style="color:#75715e"></span>
-<span style="color:#66d9ef">type</span> <span style="color:#a6e22e">ErrPrint</span> <span style="color:#66d9ef">struct</span>{}
-
-<span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">p</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">ErrPrint</span>) <span style="color:#a6e22e">String</span>() <span style="color:#66d9ef">string</span> {
-	<span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;some error happens&#34;</span>
-}
-
-<span style="color:#66d9ef">type</span> <span style="color:#a6e22e">InfoPrint</span> <span style="color:#66d9ef">struct</span>{}
-
-<span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">p</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">InfoPrint</span>) <span style="color:#a6e22e">String</span>() <span style="color:#66d9ef">string</span> {
-	<span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;nothing dramatically happens&#34;</span>
-}
-
-<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">NewPrinter</span>(<span style="color:#a6e22e">kind</span> <span style="color:#66d9ef">string</span>) (<span style="color:#a6e22e">result</span> <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Stringer</span>, <span style="color:#a6e22e">err</span> <span style="color:#66d9ef">error</span>) {
-	<span style="color:#66d9ef">switch</span> <span style="color:#a6e22e">kind</span> {
-	<span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;error&#34;</span>:
-		<span style="color:#a6e22e">result</span> = <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">ErrPrint</span>{}
-	<span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;info&#34;</span>:
-		<span style="color:#a6e22e">result</span> = <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">InfoPrint</span>{}
-	<span style="color:#66d9ef">default</span>:
-		<span style="color:#a6e22e">err</span> = <span style="color:#a6e22e">errors</span>.<span style="color:#a6e22e">New</span>(<span style="color:#e6db74">&#34;invalid kind&#34;</span>)
-	}
-	<span style="color:#66d9ef">return</span>
-}
-</code></pre></div><h2 id="decorator-functional-option">Decorator (Functional option)<a hidden class="anchor" aria-hidden="true" href="#decorator-functional-option">#</a></h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#75715e">// use Stringer as the interface
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">ErrPrint</span> <span style="color:#66d9ef">struct</span>{}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">p</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">ErrPrint</span>) <span style="color:#a6e22e">String</span>() <span style="color:#66d9ef">string</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;some error happens&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">InfoPrint</span> <span style="color:#66d9ef">struct</span>{}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">p</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">InfoPrint</span>) <span style="color:#a6e22e">String</span>() <span style="color:#66d9ef">string</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;nothing dramatically happens&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">NewPrinter</span>(<span style="color:#a6e22e">kind</span> <span style="color:#66d9ef">string</span>) (<span style="color:#a6e22e">result</span> <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Stringer</span>, <span style="color:#a6e22e">err</span> <span style="color:#66d9ef">error</span>) {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">switch</span> <span style="color:#a6e22e">kind</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;error&#34;</span>:
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">result</span> = <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">ErrPrint</span>{}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;info&#34;</span>:
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">result</span> = <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">InfoPrint</span>{}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">default</span>:
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">err</span> = <span style="color:#a6e22e">errors</span>.<span style="color:#a6e22e">New</span>(<span style="color:#e6db74">&#34;invalid kind&#34;</span>)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="decorator-functional-option">Decorator (Functional option)<a hidden class="anchor" aria-hidden="true" href="#decorator-functional-option">#</a></h2>
 <p>Để nói về pattern này, đầu tiên hãy xem ví dụ bên dưới:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">runServer</span>() {
-	<span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">HandleFunc</span>(<span style="color:#e6db74">&#34;/&#34;</span>, <span style="color:#a6e22e">helloEndpoint</span>)
-	<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Fatal</span>(<span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ListenAndServe</span>(<span style="color:#e6db74">&#34;:8080&#34;</span>, <span style="color:#66d9ef">nil</span>))
-}
-<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">helloEndpoint</span>(<span style="color:#a6e22e">w</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ResponseWriter</span>, <span style="color:#a6e22e">r</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Request</span>) {
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Fprintf</span>(<span style="color:#a6e22e">w</span>, <span style="color:#e6db74">&#34;Hello world&#34;</span>)
-}
-</code></pre></div><p>Đoạn code trên tạo ra một web server đơn giản với net/http package với một endpoint duy nhất.
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">runServer</span>() {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">HandleFunc</span>(<span style="color:#e6db74">&#34;/&#34;</span>, <span style="color:#a6e22e">helloEndpoint</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Fatal</span>(<span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ListenAndServe</span>(<span style="color:#e6db74">&#34;:8080&#34;</span>, <span style="color:#66d9ef">nil</span>))
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">helloEndpoint</span>(<span style="color:#a6e22e">w</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ResponseWriter</span>, <span style="color:#a6e22e">r</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Request</span>) {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Fprintf</span>(<span style="color:#a6e22e">w</span>, <span style="color:#e6db74">&#34;Hello world&#34;</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Đoạn code trên tạo ra một web server đơn giản với net/http package với một endpoint duy nhất.
 Bài toán được đặt ra là bây giờ cần log lại thời gian cần để hoàn tất xử lý request. Để gia tăng tính tái sử dụng, tránh phải sửa lại handler, cũng như dễ dàng bảo trì về sau, ta có thể viết như sau:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">runServer</span>() {
-	<span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">HandleFunc</span>(<span style="color:#e6db74">&#34;/&#34;</span>, <span style="color:#a6e22e">durationLogger</span>(<span style="color:#a6e22e">helloEndpoint</span>))
-	<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Fatal</span>(<span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ListenAndServe</span>(<span style="color:#e6db74">&#34;:8080&#34;</span>, <span style="color:#66d9ef">nil</span>))
-}
-
-<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">helloEndpoint</span>(<span style="color:#a6e22e">w</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ResponseWriter</span>, <span style="color:#a6e22e">r</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Request</span>) {
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Fprintf</span>(<span style="color:#a6e22e">w</span>, <span style="color:#e6db74">&#34;Hello world&#34;</span>)
-}
-
-<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">durationLogger</span>(<span style="color:#a6e22e">f</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">HandlerFunc</span>) <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">HandlerFunc</span> {
-	<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">writer</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ResponseWriter</span>, <span style="color:#a6e22e">request</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Request</span>) {
-		<span style="color:#a6e22e">startTime</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Now</span>()
-		<span style="color:#a6e22e">f</span>(<span style="color:#a6e22e">writer</span>, <span style="color:#a6e22e">request</span>)
-		<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;complete handle request after %s ms&#34;</span>, <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Since</span>(<span style="color:#a6e22e">startTime</span>).<span style="color:#a6e22e">Milliseconds</span>())
-	}
-}
-</code></pre></div><p>Như vậy, chúng ta có thể dễ dàng thêm tính năng log thời gian này vào những handler cần thiết, việc thay đổi nội dung log cũng trở nên dễ dàng hơn.
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">runServer</span>() {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">HandleFunc</span>(<span style="color:#e6db74">&#34;/&#34;</span>, <span style="color:#a6e22e">durationLogger</span>(<span style="color:#a6e22e">helloEndpoint</span>))
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Fatal</span>(<span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ListenAndServe</span>(<span style="color:#e6db74">&#34;:8080&#34;</span>, <span style="color:#66d9ef">nil</span>))
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">helloEndpoint</span>(<span style="color:#a6e22e">w</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ResponseWriter</span>, <span style="color:#a6e22e">r</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Request</span>) {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Fprintf</span>(<span style="color:#a6e22e">w</span>, <span style="color:#e6db74">&#34;Hello world&#34;</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">durationLogger</span>(<span style="color:#a6e22e">f</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">HandlerFunc</span>) <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">HandlerFunc</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">writer</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ResponseWriter</span>, <span style="color:#a6e22e">request</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Request</span>) {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">startTime</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Now</span>()
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">f</span>(<span style="color:#a6e22e">writer</span>, <span style="color:#a6e22e">request</span>)
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;complete handle request after %s ms&#34;</span>, <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Since</span>(<span style="color:#a6e22e">startTime</span>).<span style="color:#a6e22e">Milliseconds</span>())
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Như vậy, chúng ta có thể dễ dàng thêm tính năng log thời gian này vào những handler cần thiết, việc thay đổi nội dung log cũng trở nên dễ dàng hơn.
 Đây chỉ là một ví dụ đơn giản về middleware, trong thực tế việc triển khai có thể phức tạp hơn để phù hợp với các nhù cầu khác nhau.</p>
 <h2 id="iterator">Iterator<a hidden class="anchor" aria-hidden="true" href="#iterator">#</a></h2>
 <p>Tại sao lại cần pattern này thay vì duyệt (array, slice, map, channel&hellip;) trong go?</p>
@@ -295,24 +294,24 @@ Bài toán được đặt ra là bây giờ cần log lại thời gian cần �
 <li>Khi viết một module nào đó mà muốn che giấu triển khai bên dưới, chỉ cho phép phía sử dụng duyệt tuần tự các phần tử.</li>
 <li>Ví dụ io.Reader, sql/database.Row</li>
 </ul>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Iterator</span> <span style="color:#66d9ef">struct</span> {
-	<span style="color:#a6e22e">tasks</span>    []<span style="color:#66d9ef">string</span>
-	<span style="color:#a6e22e">position</span> <span style="color:#66d9ef">int</span>
-}
-<span style="color:#75715e">// Next will return the next task in the slice
-</span><span style="color:#75715e">// if there&#39;s more data to iterate, more will be true
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">t</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">Iterator</span>) <span style="color:#a6e22e">Next</span>() (<span style="color:#a6e22e">pos</span> <span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">val</span> <span style="color:#66d9ef">string</span>, <span style="color:#a6e22e">more</span> <span style="color:#66d9ef">bool</span>) {
-	<span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">position</span><span style="color:#f92672">++</span>
-	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">position</span> &gt; len(<span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">tasks</span>) {
-		<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">position</span>, <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#66d9ef">false</span>
-	}
-	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">position</span>, <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">tasks</span>[<span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">position</span><span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>], <span style="color:#66d9ef">true</span>
-}
-</code></pre></div><p>Trên đây là một ví dụ đơn giản về triển khai iterator trong go</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">val</span>, <span style="color:#a6e22e">more</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">i</span>.<span style="color:#a6e22e">Next</span>(); <span style="color:#a6e22e">more</span>; <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">val</span>, <span style="color:#a6e22e">more</span> = <span style="color:#a6e22e">i</span>.<span style="color:#a6e22e">Next</span>() {
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#a6e22e">val</span>)
-}
-</code></pre></div><h2 id="dependency-injection">Dependency Injection<a hidden class="anchor" aria-hidden="true" href="#dependency-injection">#</a></h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Iterator</span> <span style="color:#66d9ef">struct</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">tasks</span>    []<span style="color:#66d9ef">string</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">position</span> <span style="color:#66d9ef">int</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Next will return the next task in the slice
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// if there&#39;s more data to iterate, more will be true
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">t</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">Iterator</span>) <span style="color:#a6e22e">Next</span>() (<span style="color:#a6e22e">pos</span> <span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">val</span> <span style="color:#66d9ef">string</span>, <span style="color:#a6e22e">more</span> <span style="color:#66d9ef">bool</span>) {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">position</span><span style="color:#f92672">++</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">position</span> &gt; len(<span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">tasks</span>) {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">position</span>, <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">position</span>, <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">tasks</span>[<span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">position</span><span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>], <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Trên đây là một ví dụ đơn giản về triển khai iterator trong go</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">val</span>, <span style="color:#a6e22e">more</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">i</span>.<span style="color:#a6e22e">Next</span>(); <span style="color:#a6e22e">more</span>; <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">val</span>, <span style="color:#a6e22e">more</span> = <span style="color:#a6e22e">i</span>.<span style="color:#a6e22e">Next</span>() {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#a6e22e">val</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="dependency-injection">Dependency Injection<a hidden class="anchor" aria-hidden="true" href="#dependency-injection">#</a></h2>
 <p>DI trong go có thể được triển khai theo nhiều cách, có cả những thư viện chuyên dùng để DI trong go (google/wire, uber-go/fx), trong bài viết này sẽ chỉ nói vể cách triển khai đơn giản nhất</p>
 <pre tabindex="0"><code>┌────────────────────┬──────────┬────────────────────────────────┬────────┐
 │ Client package     │  Client  ├─────►      &lt;&lt;interface&gt;&gt;       │        │
@@ -327,26 +326,26 @@ Bài toán được đặt ra là bây giờ cần log lại thời gian cần �
 │                                                                         │
 └─────────────────────────────────────────────────────────────────────────┘
 </code></pre><p>Đây là một đoạn code ví dụ co dependency injection sử dụng constructor</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
-    <span style="color:#a6e22e">s</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">NewMyService</span>(<span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Stderr</span>)
-    <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">WriteHello</span>(<span style="color:#e6db74">&#34;world&#34;</span>)
-}
-<span style="color:#66d9ef">type</span> <span style="color:#a6e22e">MyService</span> <span style="color:#66d9ef">struct</span> {
-    <span style="color:#a6e22e">writer</span> <span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">Writer</span>
-}
-<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">NewMyService</span>(<span style="color:#a6e22e">writer</span> <span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">Writer</span>) <span style="color:#a6e22e">MyService</span> {
-    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">MyService</span>{
-        <span style="color:#a6e22e">writer</span>: <span style="color:#a6e22e">writer</span>,
-    }
-}
-<span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">s</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">MyService</span>) <span style="color:#a6e22e">WriteHello</span>(<span style="color:#a6e22e">m</span> <span style="color:#66d9ef">string</span>) {
-    <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Fprintf</span>(<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">writer</span>, <span style="color:#e6db74">&#34;Hello %s\n&#34;</span>, <span style="color:#a6e22e">m</span>)
-}
-</code></pre></div><p>Thêm method để có thể sử dụng setter injection:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">s</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">MyService</span>) <span style="color:#a6e22e">SetWriter</span>(<span style="color:#a6e22e">w</span> <span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">Writer</span>) {
-    <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">writer</span> = <span style="color:#a6e22e">w</span>
-}
-</code></pre></div><p>So sánh hai cách:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">s</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">NewMyService</span>(<span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Stderr</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">WriteHello</span>(<span style="color:#e6db74">&#34;world&#34;</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">MyService</span> <span style="color:#66d9ef">struct</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">writer</span> <span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">Writer</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">NewMyService</span>(<span style="color:#a6e22e">writer</span> <span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">Writer</span>) <span style="color:#a6e22e">MyService</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">MyService</span>{
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">writer</span>: <span style="color:#a6e22e">writer</span>,
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">s</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">MyService</span>) <span style="color:#a6e22e">WriteHello</span>(<span style="color:#a6e22e">m</span> <span style="color:#66d9ef">string</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Fprintf</span>(<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">writer</span>, <span style="color:#e6db74">&#34;Hello %s\n&#34;</span>, <span style="color:#a6e22e">m</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Thêm method để có thể sử dụng setter injection:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">s</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">MyService</span>) <span style="color:#a6e22e">SetWriter</span>(<span style="color:#a6e22e">w</span> <span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">Writer</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">writer</span> = <span style="color:#a6e22e">w</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>So sánh hai cách:</p>
 <ul>
 <li>constructor: Đảm bảo dependency được sử dụng luôn valid</li>
 <li>setter: Có thể thay thế concrete service trong quá trình chạy chương trình(runtime)</li>
@@ -355,77 +354,77 @@ Bài toán được đặt ra là bây giờ cần log lại thời gian cần �
 <p>Một pattern trong thiết kế phần mếm hướng tới việc tiến hóa lâu dài của ứng dụng, các module phụ thuộc có thể được thay đổi trong tương lai.
 Ví dụ dưới đề thể hiện việc triển khai một ứng dụng mà lớp storage có thể được thay đổi:
 <code>package post</code> - khai báo model</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Post</span> <span style="color:#66d9ef">struct</span> {
-	<span style="color:#a6e22e">ID</span>   <span style="color:#66d9ef">int64</span>
-	<span style="color:#a6e22e">Title</span> <span style="color:#66d9ef">string</span>
-}
-</code></pre></div><p><code>package domain</code> - khai báo các interface client sử dụng để thao tác với storage</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#75715e">// Repository must be implemented by all implementations of Post storage
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Repository</span> <span style="color:#66d9ef">interface</span> {
-	<span style="color:#a6e22e">FindAll</span>() ([]<span style="color:#a6e22e">post</span>.<span style="color:#a6e22e">Post</span>, <span style="color:#66d9ef">error</span>)
-	<span style="color:#a6e22e">Store</span>(<span style="color:#a6e22e">post</span> <span style="color:#a6e22e">post</span>.<span style="color:#a6e22e">Post</span>) (<span style="color:#a6e22e">post</span>.<span style="color:#a6e22e">Post</span>, <span style="color:#66d9ef">error</span>)
-	<span style="color:#a6e22e">DeleteById</span>(<span style="color:#a6e22e">postId</span> <span style="color:#66d9ef">int64</span>) <span style="color:#66d9ef">error</span>
-}
-</code></pre></div><p><code>package memstorage</code> - một triển khai của storage</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#75715e">//in-memory implementation
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">PostStorage</span> <span style="color:#66d9ef">struct</span> {
-	<span style="color:#a6e22e">posts</span>     <span style="color:#66d9ef">map</span>[<span style="color:#66d9ef">int64</span>]<span style="color:#66d9ef">string</span>
-	<span style="color:#a6e22e">highestID</span> <span style="color:#66d9ef">int64</span>
-}
-
-<span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">p</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">PostStorage</span>) <span style="color:#a6e22e">FindAll</span>() ([]<span style="color:#a6e22e">post</span>.<span style="color:#a6e22e">Post</span>, <span style="color:#66d9ef">error</span>) {
-	<span style="color:#a6e22e">result</span> <span style="color:#f92672">:=</span> make([]<span style="color:#a6e22e">post</span>.<span style="color:#a6e22e">Post</span>, <span style="color:#ae81ff">0</span>)
-	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">id</span>, <span style="color:#a6e22e">title</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">posts</span> {
-		<span style="color:#a6e22e">result</span> = append(<span style="color:#a6e22e">result</span>, <span style="color:#a6e22e">post</span>.<span style="color:#a6e22e">Post</span>{
-			<span style="color:#a6e22e">ID</span>:    <span style="color:#a6e22e">id</span>,
-			<span style="color:#a6e22e">Title</span>: <span style="color:#a6e22e">title</span>,
-		})
-	}
-	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">result</span>, <span style="color:#66d9ef">nil</span>
-}
-
-<span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">p</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">PostStorage</span>) <span style="color:#a6e22e">Store</span>(<span style="color:#a6e22e">post</span> <span style="color:#a6e22e">post</span>.<span style="color:#a6e22e">Post</span>) (<span style="color:#a6e22e">post</span>.<span style="color:#a6e22e">Post</span>, <span style="color:#66d9ef">error</span>) {
-	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">posts</span> <span style="color:#f92672">==</span> <span style="color:#66d9ef">nil</span> {
-		<span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">posts</span> = make(<span style="color:#66d9ef">map</span>[<span style="color:#66d9ef">int64</span>]<span style="color:#66d9ef">string</span>)
-	}
-	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">post</span>.<span style="color:#a6e22e">ID</span> <span style="color:#f92672">&lt;=</span> <span style="color:#ae81ff">0</span> {
-		<span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">highestID</span><span style="color:#f92672">++</span>
-		<span style="color:#a6e22e">post</span>.<span style="color:#a6e22e">ID</span> = <span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">highestID</span>
-	} <span style="color:#66d9ef">else</span> {
-		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">exists</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">posts</span>[<span style="color:#a6e22e">post</span>.<span style="color:#a6e22e">ID</span>]; !<span style="color:#a6e22e">exists</span> {
-			<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">post</span>, <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Errorf</span>(<span style="color:#e6db74">&#34;post already exist&#34;</span>)
-		}
-	}
-	<span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">posts</span>[<span style="color:#a6e22e">post</span>.<span style="color:#a6e22e">ID</span>] = <span style="color:#a6e22e">post</span>.<span style="color:#a6e22e">Title</span>
-	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">post</span>, <span style="color:#66d9ef">nil</span>
-
-}
-
-<span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">p</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">PostStorage</span>) <span style="color:#a6e22e">DeleteById</span>(<span style="color:#a6e22e">postId</span> <span style="color:#66d9ef">int64</span>) <span style="color:#66d9ef">error</span> {
-	delete(<span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">posts</span>, <span style="color:#a6e22e">postId</span>)
-	<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">nil</span>
-}
-</code></pre></div><p>Sử dụng repository package:
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Post</span> <span style="color:#66d9ef">struct</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">ID</span>   <span style="color:#66d9ef">int64</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">Title</span> <span style="color:#66d9ef">string</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><code>package domain</code> - khai báo các interface client sử dụng để thao tác với storage</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#75715e">// Repository must be implemented by all implementations of Post storage
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Repository</span> <span style="color:#66d9ef">interface</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">FindAll</span>() ([]<span style="color:#a6e22e">post</span>.<span style="color:#a6e22e">Post</span>, <span style="color:#66d9ef">error</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">Store</span>(<span style="color:#a6e22e">post</span> <span style="color:#a6e22e">post</span>.<span style="color:#a6e22e">Post</span>) (<span style="color:#a6e22e">post</span>.<span style="color:#a6e22e">Post</span>, <span style="color:#66d9ef">error</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">DeleteById</span>(<span style="color:#a6e22e">postId</span> <span style="color:#66d9ef">int64</span>) <span style="color:#66d9ef">error</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><code>package memstorage</code> - một triển khai của storage</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#75715e">//in-memory implementation
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">PostStorage</span> <span style="color:#66d9ef">struct</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">posts</span>     <span style="color:#66d9ef">map</span>[<span style="color:#66d9ef">int64</span>]<span style="color:#66d9ef">string</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">highestID</span> <span style="color:#66d9ef">int64</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">p</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">PostStorage</span>) <span style="color:#a6e22e">FindAll</span>() ([]<span style="color:#a6e22e">post</span>.<span style="color:#a6e22e">Post</span>, <span style="color:#66d9ef">error</span>) {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">result</span> <span style="color:#f92672">:=</span> make([]<span style="color:#a6e22e">post</span>.<span style="color:#a6e22e">Post</span>, <span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">id</span>, <span style="color:#a6e22e">title</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">posts</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">result</span> = append(<span style="color:#a6e22e">result</span>, <span style="color:#a6e22e">post</span>.<span style="color:#a6e22e">Post</span>{
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">ID</span>:    <span style="color:#a6e22e">id</span>,
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">Title</span>: <span style="color:#a6e22e">title</span>,
+</span></span><span style="display:flex;"><span>		})
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">result</span>, <span style="color:#66d9ef">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">p</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">PostStorage</span>) <span style="color:#a6e22e">Store</span>(<span style="color:#a6e22e">post</span> <span style="color:#a6e22e">post</span>.<span style="color:#a6e22e">Post</span>) (<span style="color:#a6e22e">post</span>.<span style="color:#a6e22e">Post</span>, <span style="color:#66d9ef">error</span>) {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">posts</span> <span style="color:#f92672">==</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">posts</span> = make(<span style="color:#66d9ef">map</span>[<span style="color:#66d9ef">int64</span>]<span style="color:#66d9ef">string</span>)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">post</span>.<span style="color:#a6e22e">ID</span> <span style="color:#f92672">&lt;=</span> <span style="color:#ae81ff">0</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">highestID</span><span style="color:#f92672">++</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">post</span>.<span style="color:#a6e22e">ID</span> = <span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">highestID</span>
+</span></span><span style="display:flex;"><span>	} <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">exists</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">posts</span>[<span style="color:#a6e22e">post</span>.<span style="color:#a6e22e">ID</span>]; !<span style="color:#a6e22e">exists</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">post</span>, <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Errorf</span>(<span style="color:#e6db74">&#34;post already exist&#34;</span>)
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">posts</span>[<span style="color:#a6e22e">post</span>.<span style="color:#a6e22e">ID</span>] = <span style="color:#a6e22e">post</span>.<span style="color:#a6e22e">Title</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">post</span>, <span style="color:#66d9ef">nil</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">p</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">PostStorage</span>) <span style="color:#a6e22e">DeleteById</span>(<span style="color:#a6e22e">postId</span> <span style="color:#66d9ef">int64</span>) <span style="color:#66d9ef">error</span> {
+</span></span><span style="display:flex;"><span>	delete(<span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">posts</span>, <span style="color:#a6e22e">postId</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Sử dụng repository package:
 <code>package main</code></p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
-	<span style="color:#a6e22e">postRepo</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">memstorage</span>.<span style="color:#a6e22e">PostStorage</span>{}
-	<span style="color:#75715e">//may change to other implementation in the future
-</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">newPost</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">postRepo</span>.<span style="color:#a6e22e">Store</span>(<span style="color:#a6e22e">post</span>.<span style="color:#a6e22e">Post</span>{
-		<span style="color:#a6e22e">Title</span>: <span style="color:#e6db74">&#34;Eagles fly&#34;</span>,
-	})
-	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
-		<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;can not create post&#34;</span>, <span style="color:#a6e22e">err</span>)
-	} <span style="color:#66d9ef">else</span> {
-		<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;created post with id %d&#34;</span>, <span style="color:#a6e22e">newPost</span>.<span style="color:#a6e22e">ID</span>)
-	}
-	<span style="color:#a6e22e">posts</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">postRepo</span>.<span style="color:#a6e22e">FindAll</span>()
-	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
-		<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;can not fetch posts&#34;</span>, <span style="color:#a6e22e">err</span>)
-	} <span style="color:#66d9ef">else</span> {
-		<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#a6e22e">posts</span>)
-	}
-}
-</code></pre></div><p>Bằng cách chia nhỏ việc triển khai, domain interface và model, trong trường hợp một phần mềm cần thay thế các module trong tương lai, có thể update một cách dễ dàng.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">postRepo</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">memstorage</span>.<span style="color:#a6e22e">PostStorage</span>{}
+</span></span><span style="display:flex;"><span>	<span style="color:#75715e">//may change to other implementation in the future
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#a6e22e">newPost</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">postRepo</span>.<span style="color:#a6e22e">Store</span>(<span style="color:#a6e22e">post</span>.<span style="color:#a6e22e">Post</span>{
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">Title</span>: <span style="color:#e6db74">&#34;Eagles fly&#34;</span>,
+</span></span><span style="display:flex;"><span>	})
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;can not create post&#34;</span>, <span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>	} <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;created post with id %d&#34;</span>, <span style="color:#a6e22e">newPost</span>.<span style="color:#a6e22e">ID</span>)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">posts</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">postRepo</span>.<span style="color:#a6e22e">FindAll</span>()
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;can not fetch posts&#34;</span>, <span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>	} <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#a6e22e">posts</span>)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Bằng cách chia nhỏ việc triển khai, domain interface và model, trong trường hợp một phần mềm cần thay thế các module trong tương lai, có thể update một cách dễ dàng.</p>
 <p>Mã nguồn trong bài viết có thể xem tại: <a href="https://github.com/DucHoangManh/go-patterns">https://github.com/DucHoangManh/go-patterns</a></p>
 
 
@@ -439,7 +438,7 @@ Ví dụ dưới đề thể hiện việc triển khai một ứng dụng mà l
     </ul>
 <nav class="paginav">
   <a class="prev" href="https://duchoangmanh.github.io/posts/technical/create-a-web-framework-in-go/">
-    <span class="title">« Prev Page</span>
+    <span class="title">« Prev</span>
     <br>
     <span>Create a web framework in Go part 1: static routing</span>
   </a>
@@ -449,58 +448,57 @@ Ví dụ dưới đề thể hiện việc triển khai một ứng dụng mà l
 <div class="share-buttons">
     <a target="_blank" rel="noopener noreferrer" aria-label="share Design pattern thân thiện trong go on twitter"
         href="https://twitter.com/intent/tweet/?text=Design%20pattern%20th%c3%a2n%20thi%e1%bb%87n%20trong%20go&amp;url=https%3a%2f%2fduchoangmanh.github.io%2fposts%2ftechnical%2fdesign-pattern-than-thien-trong-go%2f&amp;hashtags=go%2cdesignpattern%2cefective-go">
-        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
             <path
                 d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-253.927,424.544c135.939,0 210.268,-112.643 210.268,-210.268c0,-3.218 0,-6.437 -0.153,-9.502c14.406,-10.421 26.973,-23.448 36.935,-38.314c-13.18,5.824 -27.433,9.809 -42.452,11.648c15.326,-9.196 26.973,-23.602 32.49,-40.92c-14.252,8.429 -30.038,14.56 -46.896,17.931c-13.487,-14.406 -32.644,-23.295 -53.946,-23.295c-40.767,0 -73.87,33.104 -73.87,73.87c0,5.824 0.613,11.494 1.992,16.858c-61.456,-3.065 -115.862,-32.49 -152.337,-77.241c-6.284,10.881 -9.962,23.601 -9.962,37.088c0,25.594 13.027,48.276 32.95,61.456c-12.107,-0.307 -23.448,-3.678 -33.41,-9.196l0,0.92c0,35.862 25.441,65.594 59.311,72.49c-6.13,1.686 -12.72,2.606 -19.464,2.606c-4.751,0 -9.348,-0.46 -13.946,-1.38c9.349,29.426 36.628,50.728 68.965,51.341c-25.287,19.771 -57.164,31.571 -91.8,31.571c-5.977,0 -11.801,-0.306 -17.625,-1.073c32.337,21.15 71.264,33.41 112.95,33.41Z" />
         </svg>
     </a>
     <a target="_blank" rel="noopener noreferrer" aria-label="share Design pattern thân thiện trong go on linkedin"
         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fduchoangmanh.github.io%2fposts%2ftechnical%2fdesign-pattern-than-thien-trong-go%2f&amp;title=Design%20pattern%20th%c3%a2n%20thi%e1%bb%87n%20trong%20go&amp;summary=Design%20pattern%20th%c3%a2n%20thi%e1%bb%87n%20trong%20go&amp;source=https%3a%2f%2fduchoangmanh.github.io%2fposts%2ftechnical%2fdesign-pattern-than-thien-trong-go%2f">
-        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
             <path
                 d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
         </svg>
     </a>
     <a target="_blank" rel="noopener noreferrer" aria-label="share Design pattern thân thiện trong go on reddit"
         href="https://reddit.com/submit?url=https%3a%2f%2fduchoangmanh.github.io%2fposts%2ftechnical%2fdesign-pattern-than-thien-trong-go%2f&title=Design%20pattern%20th%c3%a2n%20thi%e1%bb%87n%20trong%20go">
-        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
             <path
                 d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-3.446,265.638c0,-22.964 -18.616,-41.58 -41.58,-41.58c-11.211,0 -21.361,4.457 -28.841,11.666c-28.424,-20.508 -67.586,-33.757 -111.204,-35.278l18.941,-89.121l61.884,13.157c0.756,15.734 13.642,28.29 29.56,28.29c16.407,0 29.706,-13.299 29.706,-29.701c0,-16.403 -13.299,-29.702 -29.706,-29.702c-11.666,0 -21.657,6.792 -26.515,16.578l-69.105,-14.69c-1.922,-0.418 -3.939,-0.042 -5.585,1.036c-1.658,1.073 -2.811,2.761 -3.224,4.686l-21.152,99.438c-44.258,1.228 -84.046,14.494 -112.837,35.232c-7.468,-7.164 -17.589,-11.591 -28.757,-11.591c-22.965,0 -41.585,18.616 -41.585,41.58c0,16.896 10.095,31.41 24.568,37.918c-0.639,4.135 -0.99,8.328 -0.99,12.576c0,63.977 74.469,115.836 166.33,115.836c91.861,0 166.334,-51.859 166.334,-115.836c0,-4.218 -0.347,-8.387 -0.977,-12.493c14.564,-6.47 24.735,-21.034 24.735,-38.001Zm-119.474,108.193c-20.27,20.241 -59.115,21.816 -70.534,21.816c-11.428,0 -50.277,-1.575 -70.522,-21.82c-3.007,-3.008 -3.007,-7.882 0,-10.889c3.003,-2.999 7.882,-3.003 10.885,0c12.777,12.781 40.11,17.317 59.637,17.317c19.522,0 46.86,-4.536 59.657,-17.321c3.016,-2.999 7.886,-2.995 10.885,0.008c3.008,3.011 3.003,7.882 -0.008,10.889Zm-5.23,-48.781c-16.373,0 -29.701,-13.324 -29.701,-29.698c0,-16.381 13.328,-29.714 29.701,-29.714c16.378,0 29.706,13.333 29.706,29.714c0,16.374 -13.328,29.698 -29.706,29.698Zm-160.386,-29.702c0,-16.381 13.328,-29.71 29.714,-29.71c16.369,0 29.689,13.329 29.689,29.71c0,16.373 -13.32,29.693 -29.689,29.693c-16.386,0 -29.714,-13.32 -29.714,-29.693Z" />
         </svg>
     </a>
     <a target="_blank" rel="noopener noreferrer" aria-label="share Design pattern thân thiện trong go on facebook"
         href="https://facebook.com/sharer/sharer.php?u=https%3a%2f%2fduchoangmanh.github.io%2fposts%2ftechnical%2fdesign-pattern-than-thien-trong-go%2f">
-        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
             <path
                 d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-106.468,0l0,-192.915l66.6,0l12.672,-82.621l-79.272,0l0,-53.617c0,-22.603 11.073,-44.636 46.58,-44.636l36.042,0l0,-70.34c0,0 -32.71,-5.582 -63.982,-5.582c-65.288,0 -107.96,39.569 -107.96,111.204l0,62.971l-72.573,0l0,82.621l72.573,0l0,192.915l-191.104,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Z" />
         </svg>
     </a>
     <a target="_blank" rel="noopener noreferrer" aria-label="share Design pattern thân thiện trong go on whatsapp"
         href="https://api.whatsapp.com/send?text=Design%20pattern%20th%c3%a2n%20thi%e1%bb%87n%20trong%20go%20-%20https%3a%2f%2fduchoangmanh.github.io%2fposts%2ftechnical%2fdesign-pattern-than-thien-trong-go%2f">
-        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
             <path
                 d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-58.673,127.703c-33.842,-33.881 -78.847,-52.548 -126.798,-52.568c-98.799,0 -179.21,80.405 -179.249,179.234c-0.013,31.593 8.241,62.428 23.927,89.612l-25.429,92.884l95.021,-24.925c26.181,14.28 55.659,21.807 85.658,21.816l0.074,0c98.789,0 179.206,-80.413 179.247,-179.243c0.018,-47.895 -18.61,-92.93 -52.451,-126.81Zm-126.797,275.782l-0.06,0c-26.734,-0.01 -52.954,-7.193 -75.828,-20.767l-5.441,-3.229l-56.386,14.792l15.05,-54.977l-3.542,-5.637c-14.913,-23.72 -22.791,-51.136 -22.779,-79.287c0.033,-82.142 66.867,-148.971 149.046,-148.971c39.793,0.014 77.199,15.531 105.329,43.692c28.128,28.16 43.609,65.592 43.594,105.4c-0.034,82.149 -66.866,148.983 -148.983,148.984Zm81.721,-111.581c-4.479,-2.242 -26.499,-13.075 -30.604,-14.571c-4.105,-1.495 -7.091,-2.241 -10.077,2.241c-2.986,4.483 -11.569,14.572 -14.182,17.562c-2.612,2.988 -5.225,3.364 -9.703,1.12c-4.479,-2.241 -18.91,-6.97 -36.017,-22.23c-13.314,-11.876 -22.304,-26.542 -24.916,-31.026c-2.612,-4.484 -0.279,-6.908 1.963,-9.14c2.016,-2.007 4.48,-5.232 6.719,-7.847c2.24,-2.615 2.986,-4.484 4.479,-7.472c1.493,-2.99 0.747,-5.604 -0.374,-7.846c-1.119,-2.241 -10.077,-24.288 -13.809,-33.256c-3.635,-8.733 -7.327,-7.55 -10.077,-7.688c-2.609,-0.13 -5.598,-0.158 -8.583,-0.158c-2.986,0 -7.839,1.121 -11.944,5.604c-4.105,4.484 -15.675,15.32 -15.675,37.364c0,22.046 16.048,43.342 18.287,46.332c2.24,2.99 31.582,48.227 76.511,67.627c10.685,4.615 19.028,7.371 25.533,9.434c10.728,3.41 20.492,2.929 28.209,1.775c8.605,-1.285 26.499,-10.833 30.231,-21.295c3.732,-10.464 3.732,-19.431 2.612,-21.298c-1.119,-1.869 -4.105,-2.99 -8.583,-5.232Z" />
         </svg>
     </a>
     <a target="_blank" rel="noopener noreferrer" aria-label="share Design pattern thân thiện trong go on telegram"
         href="https://telegram.me/share/url?text=Design%20pattern%20th%c3%a2n%20thi%e1%bb%87n%20trong%20go&amp;url=https%3a%2f%2fduchoangmanh.github.io%2fposts%2ftechnical%2fdesign-pattern-than-thien-trong-go%2f">
-        <svg version="1.1" xml:space="preserve" viewBox="2 2 28 28">
+        <svg version="1.1" xml:space="preserve" viewBox="2 2 28 28" height="30px" width="30px" fill="currentColor">
             <path
                 d="M26.49,29.86H5.5a3.37,3.37,0,0,1-2.47-1,3.35,3.35,0,0,1-1-2.47V5.48A3.36,3.36,0,0,1,3,3,3.37,3.37,0,0,1,5.5,2h21A3.38,3.38,0,0,1,29,3a3.36,3.36,0,0,1,1,2.46V26.37a3.35,3.35,0,0,1-1,2.47A3.38,3.38,0,0,1,26.49,29.86Zm-5.38-6.71a.79.79,0,0,0,.85-.66L24.73,9.24a.55.55,0,0,0-.18-.46.62.62,0,0,0-.41-.17q-.08,0-16.53,6.11a.59.59,0,0,0-.41.59.57.57,0,0,0,.43.52l4,1.24,1.61,4.83a.62.62,0,0,0,.63.43.56.56,0,0,0,.4-.17L16.54,20l4.09,3A.9.9,0,0,0,21.11,23.15ZM13.8,20.71l-1.21-4q8.72-5.55,8.78-5.55c.15,0,.23,0,.23.16a.18.18,0,0,1,0,.06s-2.51,2.3-7.52,6.8Z" />
         </svg>
     </a>
 </div>
-
   </footer>
 </article>
     </main>
     
 <footer class="footer">
-    <span>&copy; 2022 <a href="https://duchoangmanh.github.io/">duchm</a></span>
+    <span>&copy; 2024 <a href="https://duchoangmanh.github.io/">duchm</a></span>
     <span>
         Powered by
         <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
-        <a href="https://git.io/hugopapermod" rel="noopener" target="_blank">PaperMod</a>
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
     </span>
 </footer>
 <a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
@@ -569,12 +567,12 @@ Ví dụ dưới đề thể hiện việc triển khai một ứng dụng mà l
 
         const copybutton = document.createElement('button');
         copybutton.classList.add('copy-code');
-        copybutton.innerText = 'copy';
+        copybutton.innerHTML = 'copy';
 
         function copyingDone() {
-            copybutton.innerText = 'copied!';
+            copybutton.innerHTML = 'copied!';
             setTimeout(() => {
-                copybutton.innerText = 'copy';
+                copybutton.innerHTML = 'copy';
             }, 2000);
         }
 

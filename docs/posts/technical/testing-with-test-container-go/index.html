@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>How to write integration tests with test container in Go | duchm</title>
+<meta name="keywords" content="go, efective-go">
+<meta name="description" content="The significance of integration testing in assuring the reliability and seamless operation of software systems cannot be understated. This guide will help you get started with using containers for integration testing and learn how to set up and execute test cases effectively.
+Let&rsquo;s consider a small example program where I use postgres as the underlying database to store product records:
+create table product ( id serial8 not null primary key, name varchar(100) not null, type varchar(50) not null, code varchar(50) not null, price int4 not null ); The program can create, update and list products via a repository:">
+<meta name="author" content="Duc">
+<link rel="canonical" href="https://duchoangmanh.github.io/posts/technical/testing-with-test-container-go/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.6a98292fb8fa8cf0f3ba4042d4b75515c04267550f3ad49ff6271b5af9562443.css" integrity="sha256-apgpL7j6jPDzukBC1LdVFcBCZ1UPOtSf9icbWvlWJEM=" rel="preload stylesheet" as="style">
+<script defer crossorigin="anonymous" src="/assets/js/highlight.f413e19d0714851f6474e7ee9632408e58ac146fbdbe62747134bea2fa3415e0.js" integrity="sha256-9BPhnQcUhR9kdOfuljJAjlisFG&#43;9vmJ0cTS&#43;ovo0FeA="
+    onload="hljs.initHighlightingOnLoad();"></script>
+<link rel="icon" href="https://duchoangmanh.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://duchoangmanh.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://duchoangmanh.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://duchoangmanh.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://duchoangmanh.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --hljs-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript><meta property="og:title" content="How to write integration tests with test container in Go" />
+<meta property="og:description" content="The significance of integration testing in assuring the reliability and seamless operation of software systems cannot be understated. This guide will help you get started with using containers for integration testing and learn how to set up and execute test cases effectively.
+Let&rsquo;s consider a small example program where I use postgres as the underlying database to store product records:
+create table product ( id serial8 not null primary key, name varchar(100) not null, type varchar(50) not null, code varchar(50) not null, price int4 not null ); The program can create, update and list products via a repository:" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://duchoangmanh.github.io/posts/technical/testing-with-test-container-go/" /><meta property="og:image" content="https://duchoangmanh.github.io/papermod-cover.png"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2023-12-27T18:31:05+07:00" />
+<meta property="article:modified_time" content="2023-12-27T18:31:05+07:00" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://duchoangmanh.github.io/papermod-cover.png"/>
+
+<meta name="twitter:title" content="How to write integration tests with test container in Go"/>
+<meta name="twitter:description" content="The significance of integration testing in assuring the reliability and seamless operation of software systems cannot be understated. This guide will help you get started with using containers for integration testing and learn how to set up and execute test cases effectively.
+Let&rsquo;s consider a small example program where I use postgres as the underlying database to store product records:
+create table product ( id serial8 not null primary key, name varchar(100) not null, type varchar(50) not null, code varchar(50) not null, price int4 not null ); The program can create, update and list products via a repository:"/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://duchoangmanh.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "How to write integration tests with test container in Go",
+      "item": "https://duchoangmanh.github.io/posts/technical/testing-with-test-container-go/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "How to write integration tests with test container in Go",
+  "name": "How to write integration tests with test container in Go",
+  "description": "The significance of integration testing in assuring the reliability and seamless operation of software systems cannot be understated. This guide will help you get started with using containers for integration testing and learn how to set up and execute test cases effectively.\nLet\u0026rsquo;s consider a small example program where I use postgres as the underlying database to store product records:\ncreate table product ( id serial8 not null primary key, name varchar(100) not null, type varchar(50) not null, code varchar(50) not null, price int4 not null ); The program can create, update and list products via a repository:",
+  "keywords": [
+    "go", "efective-go"
+  ],
+  "articleBody": "The significance of integration testing in assuring the reliability and seamless operation of software systems cannot be understated. This guide will help you get started with using containers for integration testing and learn how to set up and execute test cases effectively.\nLet’s consider a small example program where I use postgres as the underlying database to store product records:\ncreate table product ( id serial8 not null primary key, name varchar(100) not null, type varchar(50) not null, code varchar(50) not null, price int4 not null ); The program can create, update and list products via a repository:\ntype Product struct { ID int64 `db:\"id\"` Name string `db:\"name\"` Type string `db:\"type\"` Code string `db:\"code\"` Price int64 `db:\"price\"` } ... type ProductPersistenceRepository struct { db *sqlx.DB } func (r *ProductPersistenceRepository) Create(product Product) (Product, error) { created := Product{} rows, err := r.db.NamedQuery( \"INSERT INTO product (name, type, code, price) VALUES (:name, :type, :code, :price) RETURNING *\", product, ) if err != nil { return created, fmt.Errorf(\"ProductPersistenceRepository Create: %w\", err) } for rows.Next() { if err := rows.StructScan(\u0026created); err != nil { return created, fmt.Errorf(\"ProductPersistenceRepository Create: %w\", err) } } return created, nil } ... // update and list functions To test these functions against a real database, we’ll need a clean database instance.\nWith a bit of research, we can find that starting and cleaning up containerized dependencies can be done with ease by running database within a container as part of the test itself.\nI have come across some libraries that help to effectively spin up testing container, such as dockertest or testcontainer, which I will utilize in this guide. To begin, let’s write some code that runs a postgres container and returns the container address and port for later connection.\nfunc NewTestDatabase(t *testing.T) (string, string) { ctx, cancel := context.WithTimeout(context.Background(), time.Minute) defer cancel() req := testcontainers.ContainerRequest{ Image: \"postgres:12\", ExposedPorts: []string{\"5432/tcp\"}, HostConfigModifier: func(config *container.HostConfig) { config.AutoRemove = true }, Env: map[string]string{ \"POSTGRES_USER\": \"denishoang\", \"POSTGRES_PASSWORD\": \"pgpassword\", \"POSTGRES_DB\": \"products\", }, WaitingFor: wait.ForListeningPort(\"5432/tcp\"), } postgres, err := testcontainers.GenericContainer( ctx, testcontainers.GenericContainerRequest{ ContainerRequest: req, Started: true, }, ) require.NoError(t, err) mappedPort, err := postgres.MappedPort(ctx, \"5432\") require.NoError(t, err) hostIP, err := postgres.Host(ctx) require.NoError(t, err) return hostIP, mappedPort.Port() } The function above runs a postgres container like you normally do with docker cli by interacting with the docker api.\nNotice the request’s param WaitingFor: wait.ForListeningPort(\"5432/tcp\"), with this configuration, our tests will check if the container is listening to a specific port (5432/tcp in this case) before proceeding to the next part, makes sure that the database is ready before performing any tests. You can take a look at other wait strategies supported by testcontainer here.\nThis way, we can spin up a clean database for each test and remove it after the test is done.\nLet’s get our hands dirty with the integration test, we’ll use the address and port returned from the NewTestDatabase function to connect to the database and perform the tests.\nfunc Test_Product(t *testing.T) { host, port := NewTestDatabase(t) db, err := sqlx.Connect( \"postgres\", fmt.Sprintf( \"postgres://denishoang:pgpassword@%s:%s/products?sslmode=disable\", host, port, ), ) require.Nil(t, err) repo := repository.NewProductPersistenceRepository(db) t.Run( \"test create product\", func(t *testing.T) { created, err := repo.Create( repository.Product{ Name: \"cake\", Type: \"food\", Code: \"c1\", Price: 100, }, ) require.Nil(t, err) require.Equal(t, \"cake\", created.Name) }, ) } try to run the test, and you’ll see in the logs that the postgres container is being created and started, and the test is being executed.\n✅ Container created: ec1c30ac431b 🐳 Starting container: ec1c30ac431b ✅ Container started: ec1c30ac431b 🚧 Waiting for container id ec1c30ac431b image: postgres:12. Waiting for: \u0026{Port:5432/tcp timeout: PollInterval:100ms} then the test failed, is there something wrong?\n=== RUN Test_Product/test_create_product product_test.go:34: Error Trace:\tproduct_test.go:34 Error: Expected nil, but got: \u0026fmt.wrapError{msg:\"ProductPersistenceRepository Create: pq: relation \\\"product\\\" does not exist\", err:(*pq.Error)(0x14000442b40)} Test: Test_Product/test_create_product --- FAIL: Test_Product/test_create_product (0.00s) The error message tells us that the table product does not exist, since we are using a clean database, it’s necessary to perform some migrations before running the test.\nI’m using golang-migrate to do the migrations, this involves placing all the migration files in a directory and applying them before the tests.\n//go:embed \"migrations\" var EmbeddedFiles embed.FS package persistence func MigrationUp(completeDsn string) error { iofsDriver, err := iofs.New(EmbeddedFiles, \"migrations\") if err != nil { return err } migrator, err := migrate.NewWithSourceInstance(\"iofs\", iofsDriver, completeDsn) if err != nil { return err } return migrator.Up() } use this function after the database is ready:\nfunc NewTestDatabase(t *testing.T) (string, string) { ... err = persistence.MigrationUp( fmt.Sprintf( \"postgres://denishoang:pgpassword@%s:%s/products?sslmode=disable\", hostIP, mappedPort.Port(), ), ) require.NoError(t, err) return hostIP, mappedPort.Port() } Now, the test should pass.\nHowever, there are still some things to consider: We don’t really need an entire database instance for each test as it can be resource-consuming and unnecessary.\nIdeally, we can reuse the previously created database instance and create a new database for each test.\nLet’s rewrite the NewTestDatabase function, instead of directly return the address and port of the database instance, we just create a new database instance that can be reused later.\nvar postgresContainer testcontainers.Container func StartDatabase() { ctx, cancel := context.WithTimeout(context.Background(), time.Minute) defer cancel() req := testcontainers.ContainerRequest{ Image: \"postgres:12\", ExposedPorts: []string{\"5432/tcp\"}, HostConfigModifier: func(config *container.HostConfig) { config.AutoRemove = true }, Env: map[string]string{ \"POSTGRES_USER\": \"denishoang\", \"POSTGRES_PASSWORD\": \"pgpassword\", \"POSTGRES_DB\": \"products\", }, WaitingFor: wait.ForListeningPort(\"5432/tcp\"), } postgres, err := testcontainers.GenericContainer( ctx, testcontainers.GenericContainerRequest{ ContainerRequest: req, Started: true, }, ) if err != nil { os.Exit(1) } postgresContainer = postgres } And a function to create a new database for each test:\nfunc NewDatabase(t *testing.T) *sqlx.DB { ctx := context.Background() if postgresContainer == nil { t.Fatal(\"postgres is not yet started\") } mappedPort, err := postgresContainer.MappedPort(ctx, \"5432\") if err != nil { t.Fatal(\"err get mapped port from container\") } hostIP, err := postgresContainer.Host(ctx) // open connection to postgres instance in order to create other databases baseDb, err := sqlx.Open( \"postgres\", fmt.Sprintf( \"postgres://denishoang:pgpassword@%s:%s/products?sslmode=disable\", hostIP, mappedPort.Port(), ), ) defer func() { if err := baseDb.Close(); err != nil { t.Fatal(\"err close connection to db\") } }() // a naive scheme to generate random database names dbName := fmt.Sprintf(\"%s_%d\", \"products\", rand.Int63()) if _, err := baseDb.Exec(fmt.Sprintf(\"CREATE DATABASE %s;\", dbName)); err != nil { t.Fatal(\"err creating postgres database\") } connString := fmt.Sprintf( \"postgres://denishoang:pgpassword@%s:%s/%s?sslmode=disable\", hostIP, mappedPort.Port(), dbName, ) // apply migrations to the newly created database if err = persistence.MigrationUp(connString); err != nil { t.Fatal(\"err connect postgres database\") } // connect to new database db, err := sqlx.Open(\"postgres\", connString) if err != nil { t.Fatal(\"err connect postgres database\") } return db } As you can see, there is quite a bit happening here; let me explain:\nWe have started the postgres container in the StartDatabase function, and stored the container instance in a global variable. The NewDatabase function will create a new database for each test, by connecting to the postgres instance and creating a new database with a random name. It then applies migrations to the new database and returns the connection to the new database. The test that calls NewDatabase function will have its own database so, there is no need to worry about cleaning up the database after each test. Another positive aspect is that our tests can run in parallel without any issues. But we still have a problem, how to run StartDatabase before any tests?\nLuckily, go’s build in test utility provides the TestMain function, which allows us to run some setup code before or after all the tests residing in a package.\nfunc TestMain(m *testing.M) { StartDatabase() code := m.Run() // go test will decide whether the tests failed or not by exit code os.Exit(code) Put everything together by modifying our tests:\nfunc Test_Product(t *testing.T) { t.Parallel() t.Run( \"test create product\", func(t *testing.T) { t.Parallel() db := NewDatabase(t) repo := repository.NewProductPersistenceRepository(db) created, err := repo.Create( repository.Product{ Name: \"cake\", Type: \"food\", Code: \"c1\", Price: 100, }, ) require.Nil(t, err) require.Equal(t, \"cake\", created.Name) }, ) t.Run( \"test get all products\", func(t *testing.T) { t.Parallel() db := NewDatabase(t) repo := repository.NewProductPersistenceRepository(db) _, err := repo.Create( repository.Product{ Name: \"cake\", Type: \"food\", Code: \"c1\", Price: 100, }, ) require.Nil(t, err) products, err := repo.GetAll() require.Nil(t, err) require.Len(t, products, 1) }, ) t.Run( \"test update product\", func(t *testing.T) { t.Parallel() db := NewDatabase(t) repo := repository.NewProductPersistenceRepository(db) created, err := repo.Create( repository.Product{ Name: \"cake\", Type: \"food\", Code: \"c1\", Price: 100, }, ) require.Nil(t, err) created.Name = \"new cake\" updated, err := repo.Update(created) require.Nil(t, err) require.Equal(t, \"new cake\", updated.Name) }, ) } We have learned how to use container for integration testing, and how to set up and execute test cases effectively. You can see the full code here\nReferences https://golang.testcontainers.org/ ",
+  "wordCount" : "1413",
+  "inLanguage": "en",
+  "datePublished": "2023-12-27T18:31:05+07:00",
+  "dateModified": "2023-12-27T18:31:05+07:00",
+  "author":{
+    "@type": "Person",
+    "name": "Duc"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://duchoangmanh.github.io/posts/technical/testing-with-test-container-go/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "duchm",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://duchoangmanh.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://duchoangmanh.github.io/" accesskey="h" title="duchm (Alt + H)">duchm</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://duchoangmanh.github.io/archives" title="Archive">
+                    <span>Archive</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://duchoangmanh.github.io/categories/" title="Categories">
+                    <span>Categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://duchoangmanh.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://duchoangmanh.github.io/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://duchoangmanh.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://duchoangmanh.github.io/posts/">Posts</a></div>
+    <h1 class="post-title">
+      How to write integration tests with test container in Go
+    </h1>
+    <div class="post-meta">&lt;span title=&#39;2023-12-27 18:31:05 &#43;0700 &#43;07&#39;&gt;December 27, 2023&lt;/span&gt;&amp;nbsp;·&amp;nbsp;7 min&amp;nbsp;·&amp;nbsp;Duc&nbsp;|&nbsp;<a href="https://github.com/adityatelange/hugo-PaperMod/tree/exampleSite/content/posts/technical/testing-with-test-container-go.md" rel="noopener noreferrer" target="_blank">Suggest Changes</a>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#references" aria-label="References">References</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><p>The significance of integration testing in assuring the reliability and seamless operation of software systems cannot be understated.
+This guide will help you get started with using containers for integration testing and learn how to set up and execute test cases effectively.</p>
+<p>Let&rsquo;s consider a small example program where I use postgres as the underlying database to store product records:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-SQL" data-lang="SQL"><span style="display:flex;"><span><span style="color:#66d9ef">create</span> <span style="color:#66d9ef">table</span> product  
+</span></span><span style="display:flex;"><span>(  
+</span></span><span style="display:flex;"><span>    id    serial8      <span style="color:#66d9ef">not</span> <span style="color:#66d9ef">null</span> <span style="color:#66d9ef">primary</span> <span style="color:#66d9ef">key</span>,  
+</span></span><span style="display:flex;"><span>    name  varchar(<span style="color:#ae81ff">100</span>) <span style="color:#66d9ef">not</span> <span style="color:#66d9ef">null</span>,  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">type</span>  varchar(<span style="color:#ae81ff">50</span>)  <span style="color:#66d9ef">not</span> <span style="color:#66d9ef">null</span>,  
+</span></span><span style="display:flex;"><span>    code  varchar(<span style="color:#ae81ff">50</span>)  <span style="color:#66d9ef">not</span> <span style="color:#66d9ef">null</span>,  
+</span></span><span style="display:flex;"><span>    price int4         <span style="color:#66d9ef">not</span> <span style="color:#66d9ef">null</span>  
+</span></span><span style="display:flex;"><span>);
+</span></span></code></pre></div><p>The program can create, update and list products via a repository:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Product</span> <span style="color:#66d9ef">struct</span> {  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">ID</span>    <span style="color:#66d9ef">int64</span>  <span style="color:#e6db74">`db:&#34;id&#34;`</span>  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Name</span>  <span style="color:#66d9ef">string</span> <span style="color:#e6db74">`db:&#34;name&#34;`</span>  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Type</span>  <span style="color:#66d9ef">string</span> <span style="color:#e6db74">`db:&#34;type&#34;`</span>  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Code</span>  <span style="color:#66d9ef">string</span> <span style="color:#e6db74">`db:&#34;code&#34;`</span>  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Price</span> <span style="color:#66d9ef">int64</span>  <span style="color:#e6db74">`db:&#34;price&#34;`</span>  
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#f92672">...</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">ProductPersistenceRepository</span> <span style="color:#66d9ef">struct</span> {  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">db</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">sqlx</span>.<span style="color:#a6e22e">DB</span>  
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">r</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">ProductPersistenceRepository</span>) <span style="color:#a6e22e">Create</span>(<span style="color:#a6e22e">product</span> <span style="color:#a6e22e">Product</span>) (<span style="color:#a6e22e">Product</span>, <span style="color:#66d9ef">error</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">created</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">Product</span>{}
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">rows</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">db</span>.<span style="color:#a6e22e">NamedQuery</span>(
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;INSERT INTO product (name, type, code, price) VALUES (:name, :type, :code, :price) RETURNING *&#34;</span>, <span style="color:#a6e22e">product</span>,
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">created</span>, <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Errorf</span>(<span style="color:#e6db74">&#34;ProductPersistenceRepository Create: %w&#34;</span>, <span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">rows</span>.<span style="color:#a6e22e">Next</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">rows</span>.<span style="color:#a6e22e">StructScan</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">created</span>); <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">created</span>, <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Errorf</span>(<span style="color:#e6db74">&#34;ProductPersistenceRepository Create: %w&#34;</span>, <span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">created</span>, <span style="color:#66d9ef">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#f92672">...</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// update and list functions
+</span></span></span></code></pre></div><p>To test these functions against a real database, we&rsquo;ll need a clean database instance.<br>
+With a bit of research, we can find that starting and cleaning up containerized dependencies can be done with ease by running database within a container as part of the test itself.<br>
+I have come across some libraries that help to effectively spin up testing container, such as <a href="https://github.com/ory/dockertest">dockertest</a> or <a href="https://golang.testcontainers.org/">testcontainer</a>, which I will utilize in this guide.
+To begin, let&rsquo;s write some code that runs a postgres container and returns the container address and port for later connection.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">NewTestDatabase</span>(<span style="color:#a6e22e">t</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">testing</span>.<span style="color:#a6e22e">T</span>) (<span style="color:#66d9ef">string</span>, <span style="color:#66d9ef">string</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">ctx</span>, <span style="color:#a6e22e">cancel</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">WithTimeout</span>(<span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Background</span>(), <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Minute</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">defer</span> <span style="color:#a6e22e">cancel</span>()
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">req</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">testcontainers</span>.<span style="color:#a6e22e">ContainerRequest</span>{
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">Image</span>:        <span style="color:#e6db74">&#34;postgres:12&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">ExposedPorts</span>: []<span style="color:#66d9ef">string</span>{<span style="color:#e6db74">&#34;5432/tcp&#34;</span>},
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">HostConfigModifier</span>: <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">config</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">container</span>.<span style="color:#a6e22e">HostConfig</span>) {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">config</span>.<span style="color:#a6e22e">AutoRemove</span> = <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">Env</span>: <span style="color:#66d9ef">map</span>[<span style="color:#66d9ef">string</span>]<span style="color:#66d9ef">string</span>{
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;POSTGRES_USER&#34;</span>:     <span style="color:#e6db74">&#34;denishoang&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;POSTGRES_PASSWORD&#34;</span>: <span style="color:#e6db74">&#34;pgpassword&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;POSTGRES_DB&#34;</span>:       <span style="color:#e6db74">&#34;products&#34;</span>,
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">WaitingFor</span>: <span style="color:#a6e22e">wait</span>.<span style="color:#a6e22e">ForListeningPort</span>(<span style="color:#e6db74">&#34;5432/tcp&#34;</span>),
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">postgres</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">testcontainers</span>.<span style="color:#a6e22e">GenericContainer</span>(
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">ctx</span>, <span style="color:#a6e22e">testcontainers</span>.<span style="color:#a6e22e">GenericContainerRequest</span>{
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">ContainerRequest</span>: <span style="color:#a6e22e">req</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">Started</span>:          <span style="color:#66d9ef">true</span>,
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">require</span>.<span style="color:#a6e22e">NoError</span>(<span style="color:#a6e22e">t</span>, <span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">mappedPort</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">postgres</span>.<span style="color:#a6e22e">MappedPort</span>(<span style="color:#a6e22e">ctx</span>, <span style="color:#e6db74">&#34;5432&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">require</span>.<span style="color:#a6e22e">NoError</span>(<span style="color:#a6e22e">t</span>, <span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">hostIP</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">postgres</span>.<span style="color:#a6e22e">Host</span>(<span style="color:#a6e22e">ctx</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">require</span>.<span style="color:#a6e22e">NoError</span>(<span style="color:#a6e22e">t</span>, <span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">hostIP</span>, <span style="color:#a6e22e">mappedPort</span>.<span style="color:#a6e22e">Port</span>()
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>The function above runs a postgres container like you normally do with docker cli by interacting with the docker api.</p>
+<p>Notice the request&rsquo;s param <code>WaitingFor: wait.ForListeningPort(&quot;5432/tcp&quot;)</code>, with this configuration, our tests will check if the container is listening to a specific port (<code>5432/tcp</code> in this case) before proceeding to the next part, makes sure that the database is ready before performing any tests. You can take a look at other wait strategies supported by testcontainer <a href="https://golang.testcontainers.org/features/wait/introduction/">here</a>.</p>
+<p>This way, we can spin up a clean database for each test and remove it after the test is done.</p>
+<p>Let&rsquo;s get our hands dirty with the integration test, we&rsquo;ll use the address and port returned from the <code>NewTestDatabase</code> function to connect to the database and perform the tests.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">Test_Product</span>(<span style="color:#a6e22e">t</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">testing</span>.<span style="color:#a6e22e">T</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">host</span>, <span style="color:#a6e22e">port</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">NewTestDatabase</span>(<span style="color:#a6e22e">t</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">db</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">sqlx</span>.<span style="color:#a6e22e">Connect</span>(
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;postgres&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Sprintf</span>(
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;postgres://denishoang:pgpassword@%s:%s/products?sslmode=disable&#34;</span>, <span style="color:#a6e22e">host</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">port</span>,
+</span></span><span style="display:flex;"><span>        ),
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">require</span>.<span style="color:#a6e22e">Nil</span>(<span style="color:#a6e22e">t</span>, <span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">repo</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">repository</span>.<span style="color:#a6e22e">NewProductPersistenceRepository</span>(<span style="color:#a6e22e">db</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">Run</span>(
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;test create product&#34;</span>, <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">t</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">testing</span>.<span style="color:#a6e22e">T</span>) {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">created</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">repo</span>.<span style="color:#a6e22e">Create</span>(
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">repository</span>.<span style="color:#a6e22e">Product</span>{
+</span></span><span style="display:flex;"><span>                    <span style="color:#a6e22e">Name</span>:  <span style="color:#e6db74">&#34;cake&#34;</span>,
+</span></span><span style="display:flex;"><span>                    <span style="color:#a6e22e">Type</span>:  <span style="color:#e6db74">&#34;food&#34;</span>,
+</span></span><span style="display:flex;"><span>                    <span style="color:#a6e22e">Code</span>:  <span style="color:#e6db74">&#34;c1&#34;</span>,
+</span></span><span style="display:flex;"><span>                    <span style="color:#a6e22e">Price</span>: <span style="color:#ae81ff">100</span>,
+</span></span><span style="display:flex;"><span>                },
+</span></span><span style="display:flex;"><span>            )
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">require</span>.<span style="color:#a6e22e">Nil</span>(<span style="color:#a6e22e">t</span>, <span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">require</span>.<span style="color:#a6e22e">Equal</span>(<span style="color:#a6e22e">t</span>, <span style="color:#e6db74">&#34;cake&#34;</span>, <span style="color:#a6e22e">created</span>.<span style="color:#a6e22e">Name</span>)
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>try to run the test, and you&rsquo;ll see in the logs that the postgres container is being created and started, and the test is being executed.</p>
+<pre tabindex="0"><code>✅ Container created: ec1c30ac431b
+🐳 Starting container: ec1c30ac431b
+✅ Container started: ec1c30ac431b
+🚧 Waiting for container id ec1c30ac431b image: postgres:12. Waiting for: &amp;{Port:5432/tcp timeout:&lt;nil&gt; PollInterval:100ms}
+</code></pre><p>then the test failed, is there something wrong?</p>
+<pre tabindex="0"><code>=== RUN   Test_Product/test_create_product
+    product_test.go:34: 
+        	Error Trace:	product_test.go:34
+        	Error:      	Expected nil, but got: &amp;fmt.wrapError{msg:&#34;ProductPersistenceRepository Create: pq: relation \&#34;product\&#34; does not exist&#34;, err:(*pq.Error)(0x14000442b40)}
+        	Test:       	Test_Product/test_create_product
+    --- FAIL: Test_Product/test_create_product (0.00s)
+</code></pre><p>The error message tells us that the table <code>product</code> does not exist, since we are using a clean database, it&rsquo;s necessary to perform some migrations before running the test.</p>
+<p>I&rsquo;m using <a href="github.com/golang-migrate">golang-migrate</a> to do the migrations, this involves placing all the migration files in a directory and applying them before the tests.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#75715e">//go:embed &#34;migrations&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">EmbeddedFiles</span> <span style="color:#a6e22e">embed</span>.<span style="color:#a6e22e">FS</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#f92672">package</span> <span style="color:#a6e22e">persistence</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">MigrationUp</span>(<span style="color:#a6e22e">completeDsn</span> <span style="color:#66d9ef">string</span>) <span style="color:#66d9ef">error</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">iofsDriver</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">iofs</span>.<span style="color:#a6e22e">New</span>(<span style="color:#a6e22e">EmbeddedFiles</span>, <span style="color:#e6db74">&#34;migrations&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">err</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">migrator</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">migrate</span>.<span style="color:#a6e22e">NewWithSourceInstance</span>(<span style="color:#e6db74">&#34;iofs&#34;</span>, <span style="color:#a6e22e">iofsDriver</span>, <span style="color:#a6e22e">completeDsn</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">err</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">migrator</span>.<span style="color:#a6e22e">Up</span>()
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>use this function after the database is ready:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">NewTestDatabase</span>(<span style="color:#a6e22e">t</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">testing</span>.<span style="color:#a6e22e">T</span>) (<span style="color:#66d9ef">string</span>, <span style="color:#66d9ef">string</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">...</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">err</span> = <span style="color:#a6e22e">persistence</span>.<span style="color:#a6e22e">MigrationUp</span>(
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Sprintf</span>(
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;postgres://denishoang:pgpassword@%s:%s/products?sslmode=disable&#34;</span>, <span style="color:#a6e22e">hostIP</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">mappedPort</span>.<span style="color:#a6e22e">Port</span>(),
+</span></span><span style="display:flex;"><span>        ),
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">require</span>.<span style="color:#a6e22e">NoError</span>(<span style="color:#a6e22e">t</span>, <span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">hostIP</span>, <span style="color:#a6e22e">mappedPort</span>.<span style="color:#a6e22e">Port</span>()
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Now, the test should pass.</p>
+<p>However, there are still some things to consider: We don&rsquo;t really need an entire database instance for each test as it can be resource-consuming and unnecessary.</p>
+<p>Ideally, we can reuse the previously created database instance and create a new database for each test.</p>
+<p>Let&rsquo;s rewrite the <code>NewTestDatabase</code> function, instead of directly return the address and port of the database instance, we just create a new database instance that can be reused later.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">postgresContainer</span> <span style="color:#a6e22e">testcontainers</span>.<span style="color:#a6e22e">Container</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">StartDatabase</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">ctx</span>, <span style="color:#a6e22e">cancel</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">WithTimeout</span>(<span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Background</span>(), <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Minute</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">defer</span> <span style="color:#a6e22e">cancel</span>()
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">req</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">testcontainers</span>.<span style="color:#a6e22e">ContainerRequest</span>{
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">Image</span>:        <span style="color:#e6db74">&#34;postgres:12&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">ExposedPorts</span>: []<span style="color:#66d9ef">string</span>{<span style="color:#e6db74">&#34;5432/tcp&#34;</span>},
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">HostConfigModifier</span>: <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">config</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">container</span>.<span style="color:#a6e22e">HostConfig</span>) {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">config</span>.<span style="color:#a6e22e">AutoRemove</span> = <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">Env</span>: <span style="color:#66d9ef">map</span>[<span style="color:#66d9ef">string</span>]<span style="color:#66d9ef">string</span>{
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;POSTGRES_USER&#34;</span>:     <span style="color:#e6db74">&#34;denishoang&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;POSTGRES_PASSWORD&#34;</span>: <span style="color:#e6db74">&#34;pgpassword&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;POSTGRES_DB&#34;</span>:       <span style="color:#e6db74">&#34;products&#34;</span>,
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">WaitingFor</span>: <span style="color:#a6e22e">wait</span>.<span style="color:#a6e22e">ForListeningPort</span>(<span style="color:#e6db74">&#34;5432/tcp&#34;</span>),
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">postgres</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">testcontainers</span>.<span style="color:#a6e22e">GenericContainer</span>(
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">ctx</span>, <span style="color:#a6e22e">testcontainers</span>.<span style="color:#a6e22e">GenericContainerRequest</span>{
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">ContainerRequest</span>: <span style="color:#a6e22e">req</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">Started</span>:          <span style="color:#66d9ef">true</span>,
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Exit</span>(<span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">postgresContainer</span> = <span style="color:#a6e22e">postgres</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>And a function to create a new database for each test:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">NewDatabase</span>(<span style="color:#a6e22e">t</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">testing</span>.<span style="color:#a6e22e">T</span>) <span style="color:#f92672">*</span><span style="color:#a6e22e">sqlx</span>.<span style="color:#a6e22e">DB</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">ctx</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Background</span>()
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">postgresContainer</span> <span style="color:#f92672">==</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">Fatal</span>(<span style="color:#e6db74">&#34;postgres is not yet started&#34;</span>)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">mappedPort</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">postgresContainer</span>.<span style="color:#a6e22e">MappedPort</span>(<span style="color:#a6e22e">ctx</span>, <span style="color:#e6db74">&#34;5432&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">Fatal</span>(<span style="color:#e6db74">&#34;err get mapped port from container&#34;</span>)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">hostIP</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">postgresContainer</span>.<span style="color:#a6e22e">Host</span>(<span style="color:#a6e22e">ctx</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// open connection to postgres instance in order to create other databases
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">baseDb</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">sqlx</span>.<span style="color:#a6e22e">Open</span>(
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;postgres&#34;</span>, <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Sprintf</span>(
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;postgres://denishoang:pgpassword@%s:%s/products?sslmode=disable&#34;</span>, <span style="color:#a6e22e">hostIP</span>, <span style="color:#a6e22e">mappedPort</span>.<span style="color:#a6e22e">Port</span>(),
+</span></span><span style="display:flex;"><span>        ),
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">defer</span> <span style="color:#66d9ef">func</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">baseDb</span>.<span style="color:#a6e22e">Close</span>(); <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">Fatal</span>(<span style="color:#e6db74">&#34;err close connection to db&#34;</span>)
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }()
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// a naive scheme to generate random database names
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">dbName</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Sprintf</span>(<span style="color:#e6db74">&#34;%s_%d&#34;</span>, <span style="color:#e6db74">&#34;products&#34;</span>, <span style="color:#a6e22e">rand</span>.<span style="color:#a6e22e">Int63</span>())
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">baseDb</span>.<span style="color:#a6e22e">Exec</span>(<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Sprintf</span>(<span style="color:#e6db74">&#34;CREATE DATABASE %s;&#34;</span>, <span style="color:#a6e22e">dbName</span>)); <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">Fatal</span>(<span style="color:#e6db74">&#34;err creating postgres database&#34;</span>)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">connString</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Sprintf</span>(
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;postgres://denishoang:pgpassword@%s:%s/%s?sslmode=disable&#34;</span>, <span style="color:#a6e22e">hostIP</span>, <span style="color:#a6e22e">mappedPort</span>.<span style="color:#a6e22e">Port</span>(), <span style="color:#a6e22e">dbName</span>,
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// apply migrations to the newly created database
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> = <span style="color:#a6e22e">persistence</span>.<span style="color:#a6e22e">MigrationUp</span>(<span style="color:#a6e22e">connString</span>); <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">Fatal</span>(<span style="color:#e6db74">&#34;err connect postgres database&#34;</span>)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// connect to new database
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">db</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">sqlx</span>.<span style="color:#a6e22e">Open</span>(<span style="color:#e6db74">&#34;postgres&#34;</span>, <span style="color:#a6e22e">connString</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">Fatal</span>(<span style="color:#e6db74">&#34;err connect postgres database&#34;</span>)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">db</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>As you can see, there is quite a bit happening here; let me explain:</p>
+<ul>
+<li>We have started the postgres container in the <code>StartDatabase</code> function, and stored the container instance in a global variable.</li>
+<li>The <code>NewDatabase</code> function will create a new database for each test, by connecting to the postgres instance and creating a new database with a random name. It then applies migrations to the new database and returns the connection to the new database.</li>
+<li>The test that calls <code>NewDatabase</code> function will have its own database so, there is no need to worry about cleaning up the database after each test.</li>
+<li>Another positive aspect is that our tests can run in parallel without any issues.</li>
+</ul>
+<p>But we still have a problem, how to run <code>StartDatabase</code> before any tests?<br>
+Luckily, go&rsquo;s build in test utility provides the <code>TestMain</code> function, which allows us to run some setup code before or after all the tests residing in a package.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">TestMain</span>(<span style="color:#a6e22e">m</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">testing</span>.<span style="color:#a6e22e">M</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">StartDatabase</span>()
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">code</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">m</span>.<span style="color:#a6e22e">Run</span>()
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// go test will decide whether the tests failed or not by exit code
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Exit</span>(<span style="color:#a6e22e">code</span>)
+</span></span></code></pre></div><p>Put everything together by modifying our tests:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">Test_Product</span>(<span style="color:#a6e22e">t</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">testing</span>.<span style="color:#a6e22e">T</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">Parallel</span>()
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">Run</span>(
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;test create product&#34;</span>, <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">t</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">testing</span>.<span style="color:#a6e22e">T</span>) {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">Parallel</span>()
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">db</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">NewDatabase</span>(<span style="color:#a6e22e">t</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">repo</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">repository</span>.<span style="color:#a6e22e">NewProductPersistenceRepository</span>(<span style="color:#a6e22e">db</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">created</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">repo</span>.<span style="color:#a6e22e">Create</span>(
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">repository</span>.<span style="color:#a6e22e">Product</span>{
+</span></span><span style="display:flex;"><span>                    <span style="color:#a6e22e">Name</span>:  <span style="color:#e6db74">&#34;cake&#34;</span>,
+</span></span><span style="display:flex;"><span>                    <span style="color:#a6e22e">Type</span>:  <span style="color:#e6db74">&#34;food&#34;</span>,
+</span></span><span style="display:flex;"><span>                    <span style="color:#a6e22e">Code</span>:  <span style="color:#e6db74">&#34;c1&#34;</span>,
+</span></span><span style="display:flex;"><span>                    <span style="color:#a6e22e">Price</span>: <span style="color:#ae81ff">100</span>,
+</span></span><span style="display:flex;"><span>                },
+</span></span><span style="display:flex;"><span>            )
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">require</span>.<span style="color:#a6e22e">Nil</span>(<span style="color:#a6e22e">t</span>, <span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">require</span>.<span style="color:#a6e22e">Equal</span>(<span style="color:#a6e22e">t</span>, <span style="color:#e6db74">&#34;cake&#34;</span>, <span style="color:#a6e22e">created</span>.<span style="color:#a6e22e">Name</span>)
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">Run</span>(
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;test get all products&#34;</span>, <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">t</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">testing</span>.<span style="color:#a6e22e">T</span>) {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">Parallel</span>()
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">db</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">NewDatabase</span>(<span style="color:#a6e22e">t</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">repo</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">repository</span>.<span style="color:#a6e22e">NewProductPersistenceRepository</span>(<span style="color:#a6e22e">db</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">repo</span>.<span style="color:#a6e22e">Create</span>(
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">repository</span>.<span style="color:#a6e22e">Product</span>{
+</span></span><span style="display:flex;"><span>                    <span style="color:#a6e22e">Name</span>:  <span style="color:#e6db74">&#34;cake&#34;</span>,
+</span></span><span style="display:flex;"><span>                    <span style="color:#a6e22e">Type</span>:  <span style="color:#e6db74">&#34;food&#34;</span>,
+</span></span><span style="display:flex;"><span>                    <span style="color:#a6e22e">Code</span>:  <span style="color:#e6db74">&#34;c1&#34;</span>,
+</span></span><span style="display:flex;"><span>                    <span style="color:#a6e22e">Price</span>: <span style="color:#ae81ff">100</span>,
+</span></span><span style="display:flex;"><span>                },
+</span></span><span style="display:flex;"><span>            )
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">require</span>.<span style="color:#a6e22e">Nil</span>(<span style="color:#a6e22e">t</span>, <span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">products</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">repo</span>.<span style="color:#a6e22e">GetAll</span>()
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">require</span>.<span style="color:#a6e22e">Nil</span>(<span style="color:#a6e22e">t</span>, <span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">require</span>.<span style="color:#a6e22e">Len</span>(<span style="color:#a6e22e">t</span>, <span style="color:#a6e22e">products</span>, <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">Run</span>(
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;test update product&#34;</span>, <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">t</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">testing</span>.<span style="color:#a6e22e">T</span>) {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">Parallel</span>()
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">db</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">NewDatabase</span>(<span style="color:#a6e22e">t</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">repo</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">repository</span>.<span style="color:#a6e22e">NewProductPersistenceRepository</span>(<span style="color:#a6e22e">db</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">created</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">repo</span>.<span style="color:#a6e22e">Create</span>(
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">repository</span>.<span style="color:#a6e22e">Product</span>{
+</span></span><span style="display:flex;"><span>                    <span style="color:#a6e22e">Name</span>:  <span style="color:#e6db74">&#34;cake&#34;</span>,
+</span></span><span style="display:flex;"><span>                    <span style="color:#a6e22e">Type</span>:  <span style="color:#e6db74">&#34;food&#34;</span>,
+</span></span><span style="display:flex;"><span>                    <span style="color:#a6e22e">Code</span>:  <span style="color:#e6db74">&#34;c1&#34;</span>,
+</span></span><span style="display:flex;"><span>                    <span style="color:#a6e22e">Price</span>: <span style="color:#ae81ff">100</span>,
+</span></span><span style="display:flex;"><span>                },
+</span></span><span style="display:flex;"><span>            )
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">require</span>.<span style="color:#a6e22e">Nil</span>(<span style="color:#a6e22e">t</span>, <span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">created</span>.<span style="color:#a6e22e">Name</span> = <span style="color:#e6db74">&#34;new cake&#34;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">updated</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">repo</span>.<span style="color:#a6e22e">Update</span>(<span style="color:#a6e22e">created</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">require</span>.<span style="color:#a6e22e">Nil</span>(<span style="color:#a6e22e">t</span>, <span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">require</span>.<span style="color:#a6e22e">Equal</span>(<span style="color:#a6e22e">t</span>, <span style="color:#e6db74">&#34;new cake&#34;</span>, <span style="color:#a6e22e">updated</span>.<span style="color:#a6e22e">Name</span>)
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>We have learned how to use container for integration testing, and how to set up and execute test cases effectively.
+You can see the full code <a href="">here</a></p>
+<h4 id="references">References<a hidden class="anchor" aria-hidden="true" href="#references">#</a></h4>
+<ul>
+<li><a href="https://golang.testcontainers.org/">https://golang.testcontainers.org/</a></li>
+</ul>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://duchoangmanh.github.io/tags/go/">go</a></li>
+      <li><a href="https://duchoangmanh.github.io/tags/efective-go/">efective-go</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://duchoangmanh.github.io/posts/technical/exploring-go-new-loop-semantics/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>Go: Exploring new loop semantics</span>
+  </a>
+  <a class="next" href="https://duchoangmanh.github.io/posts/technical/go-reflection-qua-vi-du/">
+    <span class="title">Next »</span>
+    <br>
+    <span>Go: Giới thiệu về reflection qua ví dụ</span>
+  </a>
+</nav>
+
+
+<div class="share-buttons">
+    <a target="_blank" rel="noopener noreferrer" aria-label="share How to write integration tests with test container in Go on twitter"
+        href="https://twitter.com/intent/tweet/?text=How%20to%20write%20integration%20tests%20with%20test%20container%20in%20Go&amp;url=https%3a%2f%2fduchoangmanh.github.io%2fposts%2ftechnical%2ftesting-with-test-container-go%2f&amp;hashtags=go%2cefective-go">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-253.927,424.544c135.939,0 210.268,-112.643 210.268,-210.268c0,-3.218 0,-6.437 -0.153,-9.502c14.406,-10.421 26.973,-23.448 36.935,-38.314c-13.18,5.824 -27.433,9.809 -42.452,11.648c15.326,-9.196 26.973,-23.602 32.49,-40.92c-14.252,8.429 -30.038,14.56 -46.896,17.931c-13.487,-14.406 -32.644,-23.295 -53.946,-23.295c-40.767,0 -73.87,33.104 -73.87,73.87c0,5.824 0.613,11.494 1.992,16.858c-61.456,-3.065 -115.862,-32.49 -152.337,-77.241c-6.284,10.881 -9.962,23.601 -9.962,37.088c0,25.594 13.027,48.276 32.95,61.456c-12.107,-0.307 -23.448,-3.678 -33.41,-9.196l0,0.92c0,35.862 25.441,65.594 59.311,72.49c-6.13,1.686 -12.72,2.606 -19.464,2.606c-4.751,0 -9.348,-0.46 -13.946,-1.38c9.349,29.426 36.628,50.728 68.965,51.341c-25.287,19.771 -57.164,31.571 -91.8,31.571c-5.977,0 -11.801,-0.306 -17.625,-1.073c32.337,21.15 71.264,33.41 112.95,33.41Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share How to write integration tests with test container in Go on linkedin"
+        href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fduchoangmanh.github.io%2fposts%2ftechnical%2ftesting-with-test-container-go%2f&amp;title=How%20to%20write%20integration%20tests%20with%20test%20container%20in%20Go&amp;summary=How%20to%20write%20integration%20tests%20with%20test%20container%20in%20Go&amp;source=https%3a%2f%2fduchoangmanh.github.io%2fposts%2ftechnical%2ftesting-with-test-container-go%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share How to write integration tests with test container in Go on reddit"
+        href="https://reddit.com/submit?url=https%3a%2f%2fduchoangmanh.github.io%2fposts%2ftechnical%2ftesting-with-test-container-go%2f&title=How%20to%20write%20integration%20tests%20with%20test%20container%20in%20Go">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-3.446,265.638c0,-22.964 -18.616,-41.58 -41.58,-41.58c-11.211,0 -21.361,4.457 -28.841,11.666c-28.424,-20.508 -67.586,-33.757 -111.204,-35.278l18.941,-89.121l61.884,13.157c0.756,15.734 13.642,28.29 29.56,28.29c16.407,0 29.706,-13.299 29.706,-29.701c0,-16.403 -13.299,-29.702 -29.706,-29.702c-11.666,0 -21.657,6.792 -26.515,16.578l-69.105,-14.69c-1.922,-0.418 -3.939,-0.042 -5.585,1.036c-1.658,1.073 -2.811,2.761 -3.224,4.686l-21.152,99.438c-44.258,1.228 -84.046,14.494 -112.837,35.232c-7.468,-7.164 -17.589,-11.591 -28.757,-11.591c-22.965,0 -41.585,18.616 -41.585,41.58c0,16.896 10.095,31.41 24.568,37.918c-0.639,4.135 -0.99,8.328 -0.99,12.576c0,63.977 74.469,115.836 166.33,115.836c91.861,0 166.334,-51.859 166.334,-115.836c0,-4.218 -0.347,-8.387 -0.977,-12.493c14.564,-6.47 24.735,-21.034 24.735,-38.001Zm-119.474,108.193c-20.27,20.241 -59.115,21.816 -70.534,21.816c-11.428,0 -50.277,-1.575 -70.522,-21.82c-3.007,-3.008 -3.007,-7.882 0,-10.889c3.003,-2.999 7.882,-3.003 10.885,0c12.777,12.781 40.11,17.317 59.637,17.317c19.522,0 46.86,-4.536 59.657,-17.321c3.016,-2.999 7.886,-2.995 10.885,0.008c3.008,3.011 3.003,7.882 -0.008,10.889Zm-5.23,-48.781c-16.373,0 -29.701,-13.324 -29.701,-29.698c0,-16.381 13.328,-29.714 29.701,-29.714c16.378,0 29.706,13.333 29.706,29.714c0,16.374 -13.328,29.698 -29.706,29.698Zm-160.386,-29.702c0,-16.381 13.328,-29.71 29.714,-29.71c16.369,0 29.689,13.329 29.689,29.71c0,16.373 -13.32,29.693 -29.689,29.693c-16.386,0 -29.714,-13.32 -29.714,-29.693Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share How to write integration tests with test container in Go on facebook"
+        href="https://facebook.com/sharer/sharer.php?u=https%3a%2f%2fduchoangmanh.github.io%2fposts%2ftechnical%2ftesting-with-test-container-go%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-106.468,0l0,-192.915l66.6,0l12.672,-82.621l-79.272,0l0,-53.617c0,-22.603 11.073,-44.636 46.58,-44.636l36.042,0l0,-70.34c0,0 -32.71,-5.582 -63.982,-5.582c-65.288,0 -107.96,39.569 -107.96,111.204l0,62.971l-72.573,0l0,82.621l72.573,0l0,192.915l-191.104,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share How to write integration tests with test container in Go on whatsapp"
+        href="https://api.whatsapp.com/send?text=How%20to%20write%20integration%20tests%20with%20test%20container%20in%20Go%20-%20https%3a%2f%2fduchoangmanh.github.io%2fposts%2ftechnical%2ftesting-with-test-container-go%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-58.673,127.703c-33.842,-33.881 -78.847,-52.548 -126.798,-52.568c-98.799,0 -179.21,80.405 -179.249,179.234c-0.013,31.593 8.241,62.428 23.927,89.612l-25.429,92.884l95.021,-24.925c26.181,14.28 55.659,21.807 85.658,21.816l0.074,0c98.789,0 179.206,-80.413 179.247,-179.243c0.018,-47.895 -18.61,-92.93 -52.451,-126.81Zm-126.797,275.782l-0.06,0c-26.734,-0.01 -52.954,-7.193 -75.828,-20.767l-5.441,-3.229l-56.386,14.792l15.05,-54.977l-3.542,-5.637c-14.913,-23.72 -22.791,-51.136 -22.779,-79.287c0.033,-82.142 66.867,-148.971 149.046,-148.971c39.793,0.014 77.199,15.531 105.329,43.692c28.128,28.16 43.609,65.592 43.594,105.4c-0.034,82.149 -66.866,148.983 -148.983,148.984Zm81.721,-111.581c-4.479,-2.242 -26.499,-13.075 -30.604,-14.571c-4.105,-1.495 -7.091,-2.241 -10.077,2.241c-2.986,4.483 -11.569,14.572 -14.182,17.562c-2.612,2.988 -5.225,3.364 -9.703,1.12c-4.479,-2.241 -18.91,-6.97 -36.017,-22.23c-13.314,-11.876 -22.304,-26.542 -24.916,-31.026c-2.612,-4.484 -0.279,-6.908 1.963,-9.14c2.016,-2.007 4.48,-5.232 6.719,-7.847c2.24,-2.615 2.986,-4.484 4.479,-7.472c1.493,-2.99 0.747,-5.604 -0.374,-7.846c-1.119,-2.241 -10.077,-24.288 -13.809,-33.256c-3.635,-8.733 -7.327,-7.55 -10.077,-7.688c-2.609,-0.13 -5.598,-0.158 -8.583,-0.158c-2.986,0 -7.839,1.121 -11.944,5.604c-4.105,4.484 -15.675,15.32 -15.675,37.364c0,22.046 16.048,43.342 18.287,46.332c2.24,2.99 31.582,48.227 76.511,67.627c10.685,4.615 19.028,7.371 25.533,9.434c10.728,3.41 20.492,2.929 28.209,1.775c8.605,-1.285 26.499,-10.833 30.231,-21.295c3.732,-10.464 3.732,-19.431 2.612,-21.298c-1.119,-1.869 -4.105,-2.99 -8.583,-5.232Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share How to write integration tests with test container in Go on telegram"
+        href="https://telegram.me/share/url?text=How%20to%20write%20integration%20tests%20with%20test%20container%20in%20Go&amp;url=https%3a%2f%2fduchoangmanh.github.io%2fposts%2ftechnical%2ftesting-with-test-container-go%2f">
+        <svg version="1.1" xml:space="preserve" viewBox="2 2 28 28" height="30px" width="30px" fill="currentColor">
+            <path
+                d="M26.49,29.86H5.5a3.37,3.37,0,0,1-2.47-1,3.35,3.35,0,0,1-1-2.47V5.48A3.36,3.36,0,0,1,3,3,3.37,3.37,0,0,1,5.5,2h21A3.38,3.38,0,0,1,29,3a3.36,3.36,0,0,1,1,2.46V26.37a3.35,3.35,0,0,1-1,2.47A3.38,3.38,0,0,1,26.49,29.86Zm-5.38-6.71a.79.79,0,0,0,.85-.66L24.73,9.24a.55.55,0,0,0-.18-.46.62.62,0,0,0-.41-.17q-.08,0-16.53,6.11a.59.59,0,0,0-.41.59.57.57,0,0,0,.43.52l4,1.24,1.61,4.83a.62.62,0,0,0,.63.43.56.56,0,0,0,.4-.17L16.54,20l4.09,3A.9.9,0,0,0,21.11,23.15ZM13.8,20.71l-1.21-4q8.72-5.55,8.78-5.55c.15,0,.23,0,.23.16a.18.18,0,0,1,0,.06s-2.51,2.3-7.52,6.8Z" />
+        </svg>
+    </a>
+</div>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+    <span>&copy; 2024 <a href="https://duchoangmanh.github.io/">duchm</a></span>
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

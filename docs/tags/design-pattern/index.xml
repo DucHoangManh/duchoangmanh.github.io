@@ -5,10 +5,12 @@
     <link>https://duchoangmanh.github.io/tags/design-pattern/</link>
     <description>Recent content in design pattern on duchm</description>
     <image>
+      <title>duchm</title>
       <url>https://duchoangmanh.github.io/papermod-cover.png</url>
       <link>https://duchoangmanh.github.io/papermod-cover.png</link>
     </image>
     <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
     <lastBuildDate>Sun, 26 Dec 2021 22:14:29 +0700</lastBuildDate><atom:link href="https://duchoangmanh.github.io/tags/design-pattern/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Design pattern thân thiện trong go</title>

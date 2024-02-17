@@ -6,13 +6,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="robots" content="index, follow">
 <title>Go: Giới thiệu về type parameter (generic) qua ví dụ | duchm</title>
-<meta name="keywords" content="go, efective-go, generic" />
+<meta name="keywords" content="go, efective-go, generic">
 <meta name="description" content="1. Kiểm tra sự xuất hiện của một phần tử trong slice Type parameter hay generic là một tính năng mới xuất hiện từ phiên bản 1.18 của Go. Với generic, ta có thể viết các hàm hoặc type có thể dùng được cho nhiều kiểu dữ liệu đầu vào khác nhau mà không cần phải lặp lại code nhiều lần.
 Hãy bắt đầu với một ví dụ đơn giản và phổ biến: Kiểm tra xem string có xuất hiện trong slice hay không">
 <meta name="author" content="Duc">
-<link rel="canonical" href="https://duchoangmanh.github.io/posts/technical/go-gioi-thieu-type-parameter-qua-vi-du/" />
-<link crossorigin="anonymous" href="/assets/css/stylesheet.min.c88963fe2d79462000fd0fb1b3737783c32855d340583e4523343f8735c787f0.css" integrity="sha256-yIlj/i15RiAA/Q&#43;xs3N3g8MoVdNAWD5FIzQ/hzXHh/A=" rel="preload stylesheet" as="style">
-<script defer crossorigin="anonymous" src="/assets/js/highlight.min.7680afc38aa6b15ddf158a4f3780b7b1f7dde7e91d26f073e6229bb7a0793c92.js" integrity="sha256-doCvw4qmsV3fFYpPN4C3sffd5&#43;kdJvBz5iKbt6B5PJI="
+<link rel="canonical" href="https://duchoangmanh.github.io/posts/technical/go-gioi-thieu-type-parameter-qua-vi-du/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.6a98292fb8fa8cf0f3ba4042d4b75515c04267550f3ad49ff6271b5af9562443.css" integrity="sha256-apgpL7j6jPDzukBC1LdVFcBCZ1UPOtSf9icbWvlWJEM=" rel="preload stylesheet" as="style">
+<script defer crossorigin="anonymous" src="/assets/js/highlight.f413e19d0714851f6474e7ee9632408e58ac146fbdbe62747134bea2fa3415e0.js" integrity="sha256-9BPhnQcUhR9kdOfuljJAjlisFG&#43;9vmJ0cTS&#43;ovo0FeA="
     onload="hljs.initHighlightingOnLoad();"></script>
 <link rel="icon" href="https://duchoangmanh.github.io/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="https://duchoangmanh.github.io/favicon-16x16.png">
@@ -21,7 +21,6 @@ Hãy bắt đầu với một ví dụ đơn giản và phổ biến: Kiểm tra
 <link rel="mask-icon" href="https://duchoangmanh.github.io/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<meta name="generator" content="Hugo 0.91.2" />
 <noscript>
     <style>
         #theme-toggle,
@@ -63,8 +62,8 @@ Hãy bắt đầu với một ví dụ đơn giản và phổ biến: Kiểm tra
 Hãy bắt đầu với một ví dụ đơn giản và phổ biến: Kiểm tra xem string có xuất hiện trong slice hay không" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://duchoangmanh.github.io/posts/technical/go-gioi-thieu-type-parameter-qua-vi-du/" /><meta property="og:image" content="https://duchoangmanh.github.io/papermod-cover.png"/><meta property="article:section" content="posts" />
-<meta property="article:published_time" content="2022-06-30T20:21:52&#43;07:00" />
-<meta property="article:modified_time" content="2022-06-30T20:21:52&#43;07:00" />
+<meta property="article:published_time" content="2022-06-30T20:21:52+07:00" />
+<meta property="article:modified_time" content="2022-06-30T20:21:52+07:00" />
 
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="https://duchoangmanh.github.io/papermod-cover.png"/>
@@ -104,7 +103,7 @@ Hãy bắt đầu với một ví dụ đơn giản và phổ biến: Kiểm tra
   "keywords": [
     "go", "efective-go", "generic"
   ],
-  "articleBody": "1. Kiểm tra sự xuất hiện của một phần tử trong slice Type parameter hay generic là một tính năng mới xuất hiện từ phiên bản 1.18 của Go. Với generic, ta có thể viết các hàm hoặc type có thể dùng được cho nhiều kiểu dữ liệu đầu vào khác nhau mà không cần phải lặp lại code nhiều lần.\nHãy bắt đầu với một ví dụ đơn giản và phổ biến: Kiểm tra xem string có xuất hiện trong slice hay không\nfunc StringSliceContains(ss []string, match string) bool { for _, s := range ss { if s == match { return true } } return false } Rõ ràng là trong quá trình sử dụng thực tế, ta sẽ gặp các usecase tương tự với các kiểu dữ liệu khác. Trước khi có generic, việc phổ biến nhất sẽ là viết riêng các hàm cụ thể cho từng kiểu dữ liệu IntSliceContains(), Int64SliceContains()… bên cạnh việc sử dụng code generation hay reflection.\nCó thể thấy các hàm này đều lặp lại một logic giống nhau, chỉ khác ở kiểu dữ liệu đầu vào, với generic, ta hoàn toàn có thể rút gọn lại các hàm này lại thành một, rất gọn và dễ dàng bảo trì về sau:\nfunc SliceContains[T comparable](ss []T, match T) bool { for _, s := range ss { if s == match { return true } } return false } Giải thích:\n[T comparable] được gọi là type parameter và có thể sử dụng được với một func hoặc một type, trong trường hợp này ám chỉ việc hàm SliceContains có thể nhận vào đầu vào kiểu T thỏa mãn ràng buộc comparable.\nRàng buộc ở đây là một interface mà T cần thỏa mãn, interface này có thể chứa method signature thường thấy hoặc tập hợp các type bất kì, xem thêm package constraints.\nTa hoàn toàn có thể định nghĩa constraints cùa riêng mình.\ntype MyConstraint interface { ~int | ~string } func SliceContains[T MyConstraint](ss []T, match T) bool { for _, s := range ss { if s == match { return true } } return false } Như ví dụ trên đây, T cần là int hoặc string, toán tử ~ tức ràng buộc thỏa mãn với cả các kiểu được định nghĩa từ int hoặc string (ví dụ type Name string, type Age int)\nfunc TestSliceContains(t *testing.T) { intSlice := []int{4, 5, 6} stringSlice := []string{\"a\", \"abb\", \"c\"} fmt.Println(SliceContains(intSlice, 5)) // true \tfmt.Println(SliceContains(stringSlice, \"c\")) // true } Có thể thấy là khi gọi hàm không cần chỉ rõ ra T là kiểu gì mà chỉ cần truyền các parameter vào, go có thể tự hiểu và thực thi đúng hàm mà ta mong muốn, SliceContains[int](intSlice, 5) cũng tương đương với SliceContains(intSlice, 5).\nTa cũng có thể viết một hàm kiểm tra phần tử có thuộc slice hay không mà không có ràng buộc, thay vào đó, truyền vào một funcion equalFunc để sử dụng thay cho toán tử ==:\nfunc SliceContainsWithEqual[T any](ss []T, match T, equalFunc func(T, T) bool) bool { for _, s := range ss { if equalFunc(s, match) { return true } } return false } 2. Generic wrapper cho container/heap Trong go, khi cần sử dụng heap, ta có thể sử dụng package container/heap và implement heap.Interface cho kiểu dữ liệu muốn sử dụng.\nVí dụ một min heap cho kiểu int từ trong document của container/heap:\ntype IntHeap []int func (h IntHeap) Len() int { return len(h) } func (h IntHeap) Less(i, j int) bool { return h[i] h[j] } func (h IntHeap) Swap(i, j int) { h[i], h[j] = h[j], h[i] } func (h *IntHeap) Push(x any) { // Push and Pop use pointer receivers because they modify the slice's length, \t// not just its contents. \t*h = append(*h, x.(int)) } func (h *IntHeap) Pop() any { old := *h n := len(old) x := old[n-1] *h = old[0 : n-1] return x } Trong nhiều trường hợp, ta chỉ quan tâm tới kiểu dữ liệu và method Less, còn cách triền khai tương tự như ví dụ trên.\nCó thể dùng type parameter để đơn giản hóa việc sử dụng heap như sau:\ntype Heap[T any] struct { data []T lessFunc func(a, b T) bool } func (b *Heap[T]) Len() int { return len(b.data) } func (b *Heap[T]) Less(i, j int) bool { return b.lessFunc(b.data[i], b.data[j]) } func (b *Heap[T]) Swap(i, j int) { tmp := b.data[i] b.data[i] = b.data[j] b.data[j] = tmp } func (b *Heap[T]) Push(x any) { b.data = append(b.data, x.(T)) } func (b *Heap[T]) Pop() any { old := b.data oldLen := len(old) res := old[oldLen-1] b.data = b.data[:oldLen-1] return res } func New[T any](lessFunc func(T, T) bool) *Heap[T] { h := \u0026Heap[T]{ lessFunc: lessFunc, } heap.Init(h) return h } Type parameter cũng có thể sử dụng với type như trong ví dụ này. Mấu chốt trong cách triển khai này chính là lưu lại lessFunc trong struct Heap, do ta không thể thay đổi method Less tại runtime, thay vào đó Less sẽ gọi vào hàm được lưu trong receiver.\nTuy nhiên có thể thấy rằng kiểu của các method như Push hay Pop lại là any và để đảm bảo implement heap.Interface, ta không thể sửa signature của các method này. Ngoài ra, việc gọi trực tiếp *Heap.Pop thay vì heap.Pop(*Heap), và *Heap.Push(T) thay vì heap.Push(*Heap, T) sẽ gây ra kết quả sai, thay vào đó nên tránh cho phép gọi trực tiếp các method này. Ta sẽ wrap type mà implement heap interface trong một public Type mà sẽ nhận và trả về kết quả mong muốn:\nChuyển triển khai trên thành một unexported struct với tên base:\ntype base[T any] struct { data []T lessFunc func(a, b T) bool } func (b *base[T]) Len() int { return len(b.data) } func (b *base[T]) Less(i, j int) bool { return b.lessFunc(b.data[i], b.data[j]) } func (b *base[T]) Swap(i, j int) { tmp := b.data[i] b.data[i] = b.data[j] b.data[j] = tmp } func (b *base[T]) Push(x any) { b.data = append(b.data, x.(T)) } func (b *base[T]) Pop() any { old := b.data oldLen := len(old) res := old[oldLen-1] b.data = b.data[:oldLen-1] return res } Và viết thêm một genetic type với các method mà ta mong muốn:\ntype Heap[T any] struct { base *base[T] } func New[T any](lessFunc func(T, T) bool) *Heap[T] { b := \u0026base[T]{ lessFunc: lessFunc, } heap.Init(b) return \u0026Heap[T]{base: b} } func (h *Heap[T]) Push(t T) { heap.Push(h.base, t) } func (h *Heap[T]) Pop() T { if h.Len() == 0 { // thêm validate cho Pop \tvar t T return t } return heap.Pop(h.base).(T) // chuyển đổi kiểu trả về cho đúng } func (h *Heap[T]) Len() int { return h.base.Len() } Chạy thử:\nfunc TestGenericHeap(t *testing.T) { data := []int{0, 5, 4, 2, -5, 8, 9, -10} lessFunc := func(i, j int) bool { return j-i  0 } heap := New(lessFunc) for _, v := range data { heap.Push(v) } for heap.Len()  0 { fmt.Print(heap.Pop(), \" \") } } Kết quả:\n-10 -5 0 2 4 5 8 9 Clear hơn khá nhiều phải không? Có thể xem code đầy đủ tại đây\n3. Khi nào dùng type parameter?  Khi dùng type parameter chỉ để gọi method của constraints thì không nên dùng type parameter mà nên dùng hàm bình thường nhận vào interface. thay vì  func foo[T io.Writer](w T) { ... w.Write... ... } tốt hơn là\nfunc foo(w io.Writer) { ... w.Write... ... } như cách mà nó vẫn được viết từ trước khi go có generic.\n Và trong nhiều trường hợp, việc sử dụng type parameter có thể ảnh hưởng nhiều đến tính dễ bảo trì của code, hãy cân nhắc sử dụng các phương pháp khác đã nêu ở phần 1. Hãy nhớ là go developer vẫn sống (khá) tốt trong một thời gian dài mà không có generic (◍•ᴗ•◍)👍.  ",
+  "articleBody": "1. Kiểm tra sự xuất hiện của một phần tử trong slice Type parameter hay generic là một tính năng mới xuất hiện từ phiên bản 1.18 của Go. Với generic, ta có thể viết các hàm hoặc type có thể dùng được cho nhiều kiểu dữ liệu đầu vào khác nhau mà không cần phải lặp lại code nhiều lần.\nHãy bắt đầu với một ví dụ đơn giản và phổ biến: Kiểm tra xem string có xuất hiện trong slice hay không\nfunc StringSliceContains(ss []string, match string) bool { for _, s := range ss { if s == match { return true } } return false } Rõ ràng là trong quá trình sử dụng thực tế, ta sẽ gặp các usecase tương tự với các kiểu dữ liệu khác. Trước khi có generic, việc phổ biến nhất sẽ là viết riêng các hàm cụ thể cho từng kiểu dữ liệu IntSliceContains(), Int64SliceContains()… bên cạnh việc sử dụng code generation hay reflection.\nCó thể thấy các hàm này đều lặp lại một logic giống nhau, chỉ khác ở kiểu dữ liệu đầu vào, với generic, ta hoàn toàn có thể rút gọn lại các hàm này lại thành một, rất gọn và dễ dàng bảo trì về sau:\nfunc SliceContains[T comparable](ss []T, match T) bool { for _, s := range ss { if s == match { return true } } return false } Giải thích:\n[T comparable] được gọi là type parameter và có thể sử dụng được với một func hoặc một type, trong trường hợp này ám chỉ việc hàm SliceContains có thể nhận vào đầu vào kiểu T thỏa mãn ràng buộc comparable.\nRàng buộc ở đây là một interface mà T cần thỏa mãn, interface này có thể chứa method signature thường thấy hoặc tập hợp các type bất kì, xem thêm package constraints.\nTa hoàn toàn có thể định nghĩa constraints cùa riêng mình.\ntype MyConstraint interface { ~int | ~string } func SliceContains[T MyConstraint](ss []T, match T) bool { for _, s := range ss { if s == match { return true } } return false } Như ví dụ trên đây, T cần là int hoặc string, toán tử ~ tức ràng buộc thỏa mãn với cả các kiểu được định nghĩa từ int hoặc string (ví dụ type Name string, type Age int)\nfunc TestSliceContains(t *testing.T) { intSlice := []int{4, 5, 6} stringSlice := []string{\"a\", \"abb\", \"c\"} fmt.Println(SliceContains(intSlice, 5)) // true fmt.Println(SliceContains(stringSlice, \"c\")) // true } Có thể thấy là khi gọi hàm không cần chỉ rõ ra T là kiểu gì mà chỉ cần truyền các parameter vào, go có thể tự hiểu và thực thi đúng hàm mà ta mong muốn, SliceContains[int](intSlice, 5) cũng tương đương với SliceContains(intSlice, 5).\nTa cũng có thể viết một hàm kiểm tra phần tử có thuộc slice hay không mà không có ràng buộc, thay vào đó, truyền vào một funcion equalFunc để sử dụng thay cho toán tử ==:\nfunc SliceContainsWithEqual[T any](ss []T, match T, equalFunc func(T, T) bool) bool { for _, s := range ss { if equalFunc(s, match) { return true } } return false } 2. Generic wrapper cho container/heap Trong go, khi cần sử dụng heap, ta có thể sử dụng package container/heap và implement heap.Interface cho kiểu dữ liệu muốn sử dụng.\nVí dụ một min heap cho kiểu int từ trong document của container/heap:\ntype IntHeap []int func (h IntHeap) Len() int { return len(h) } func (h IntHeap) Less(i, j int) bool { return h[i] \u003c h[j] } func (h IntHeap) Swap(i, j int) { h[i], h[j] = h[j], h[i] } func (h *IntHeap) Push(x any) { // Push and Pop use pointer receivers because they modify the slice's length, // not just its contents. *h = append(*h, x.(int)) } func (h *IntHeap) Pop() any { old := *h n := len(old) x := old[n-1] *h = old[0 : n-1] return x } Trong nhiều trường hợp, ta chỉ quan tâm tới kiểu dữ liệu và method Less, còn cách triền khai tương tự như ví dụ trên.\nCó thể dùng type parameter để đơn giản hóa việc sử dụng heap như sau:\ntype Heap[T any] struct { data []T lessFunc func(a, b T) bool } func (b *Heap[T]) Len() int { return len(b.data) } func (b *Heap[T]) Less(i, j int) bool { return b.lessFunc(b.data[i], b.data[j]) } func (b *Heap[T]) Swap(i, j int) { tmp := b.data[i] b.data[i] = b.data[j] b.data[j] = tmp } func (b *Heap[T]) Push(x any) { b.data = append(b.data, x.(T)) } func (b *Heap[T]) Pop() any { old := b.data oldLen := len(old) res := old[oldLen-1] b.data = b.data[:oldLen-1] return res } func New[T any](lessFunc func(T, T) bool) *Heap[T] { h := \u0026Heap[T]{ lessFunc: lessFunc, } heap.Init(h) return h } Type parameter cũng có thể sử dụng với type như trong ví dụ này. Mấu chốt trong cách triển khai này chính là lưu lại lessFunc trong struct Heap, do ta không thể thay đổi method Less tại runtime, thay vào đó Less sẽ gọi vào hàm được lưu trong receiver.\nTuy nhiên có thể thấy rằng kiểu của các method như Push hay Pop lại là any và để đảm bảo implement heap.Interface, ta không thể sửa signature của các method này. Ngoài ra, việc gọi trực tiếp *Heap.Pop thay vì heap.Pop(*Heap), và *Heap.Push(T) thay vì heap.Push(*Heap, T) sẽ gây ra kết quả sai, thay vào đó nên tránh cho phép gọi trực tiếp các method này. Ta sẽ wrap type mà implement heap interface trong một public Type mà sẽ nhận và trả về kết quả mong muốn:\nChuyển triển khai trên thành một unexported struct với tên base:\ntype base[T any] struct { data []T lessFunc func(a, b T) bool } func (b *base[T]) Len() int { return len(b.data) } func (b *base[T]) Less(i, j int) bool { return b.lessFunc(b.data[i], b.data[j]) } func (b *base[T]) Swap(i, j int) { tmp := b.data[i] b.data[i] = b.data[j] b.data[j] = tmp } func (b *base[T]) Push(x any) { b.data = append(b.data, x.(T)) } func (b *base[T]) Pop() any { old := b.data oldLen := len(old) res := old[oldLen-1] b.data = b.data[:oldLen-1] return res } Và viết thêm một genetic type với các method mà ta mong muốn:\ntype Heap[T any] struct { base *base[T] } func New[T any](lessFunc func(T, T) bool) *Heap[T] { b := \u0026base[T]{ lessFunc: lessFunc, } heap.Init(b) return \u0026Heap[T]{base: b} } func (h *Heap[T]) Push(t T) { heap.Push(h.base, t) } func (h *Heap[T]) Pop() T { if h.Len() == 0 { // thêm validate cho Pop var t T return t } return heap.Pop(h.base).(T) // chuyển đổi kiểu trả về cho đúng } func (h *Heap[T]) Len() int { return h.base.Len() } Chạy thử:\nfunc TestGenericHeap(t *testing.T) { data := []int{0, 5, 4, 2, -5, 8, 9, -10} lessFunc := func(i, j int) bool { return j-i \u003e 0 } heap := New(lessFunc) for _, v := range data { heap.Push(v) } for heap.Len() \u003e 0 { fmt.Print(heap.Pop(), \" \") } } Kết quả:\n-10 -5 0 2 4 5 8 9 Clear hơn khá nhiều phải không? Có thể xem code đầy đủ tại đây\n3. Khi nào dùng type parameter? Khi dùng type parameter chỉ để gọi method của constraints thì không nên dùng type parameter mà nên dùng hàm bình thường nhận vào interface. thay vì func foo[T io.Writer](w T) { ... w.Write... ... } tốt hơn là\nfunc foo(w io.Writer) { ... w.Write... ... } như cách mà nó vẫn được viết từ trước khi go có generic.\nVà trong nhiều trường hợp, việc sử dụng type parameter có thể ảnh hưởng nhiều đến tính dễ bảo trì của code, hãy cân nhắc sử dụng các phương pháp khác đã nêu ở phần 1. Hãy nhớ là go developer vẫn sống (khá) tốt trong một thời gian dài mà không có generic (◍•ᴗ•◍)👍. ",
   "wordCount" : "1325",
   "inLanguage": "en",
   "datePublished": "2022-06-30T20:21:52+07:00",
@@ -145,14 +144,14 @@ Hãy bắt đầu với một ví dụ đơn giản và phổ biến: Kiểm tra
     <nav class="nav">
         <div class="logo">
             <a href="https://duchoangmanh.github.io/" accesskey="h" title="duchm (Alt + H)">duchm</a>
-            <span class="logo-switches">
+            <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
-                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                         stroke-linejoin="round">
                         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                     </svg>
-                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                         stroke-linejoin="round">
                         <circle cx="12" cy="12" r="5"></circle>
@@ -166,7 +165,7 @@ Hãy bắt đầu với một ví dụ đơn giản và phổ biến: Kiểm tra
                         <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
                     </svg>
                 </button>
-            </span>
+            </div>
         </div>
         <ul id="menu">
             <li>
@@ -200,7 +199,7 @@ Hãy bắt đầu với một ví dụ đơn giản và phổ biến: Kiểm tra
     <h1 class="post-title">
       Go: Giới thiệu về type parameter (generic) qua ví dụ
     </h1>
-    <div class="post-meta"><span title='2022-06-30 20:21:52 +0700 +07'>June 30, 2022</span>&nbsp;·&nbsp;7 min&nbsp;·&nbsp;Duc&nbsp;|&nbsp;<a href="https://github.com/adityatelange/hugo-PaperMod/tree/exampleSite/content/posts/technical/go-gioi-thieu-type-parameter-qua-vi-du.md" rel="noopener noreferrer" target="_blank">Suggest Changes</a>
+    <div class="post-meta">&lt;span title=&#39;2022-06-30 20:21:52 &#43;0700 &#43;07&#39;&gt;June 30, 2022&lt;/span&gt;&amp;nbsp;·&amp;nbsp;7 min&amp;nbsp;·&amp;nbsp;Duc&nbsp;|&nbsp;<a href="https://github.com/adityatelange/hugo-PaperMod/tree/exampleSite/content/posts/technical/go-gioi-thieu-type-parameter-qua-vi-du.md" rel="noopener noreferrer" target="_blank">Suggest Changes</a>
 
 </div>
   </header> <div class="toc">
@@ -225,197 +224,197 @@ Hãy bắt đầu với một ví dụ đơn giản và phổ biến: Kiểm tra
   <div class="post-content"><h3 id="1-kiểm-tra-sự-xuất-hiện-của-một-phần-tử-trong-slice">1. Kiểm tra sự xuất hiện của một phần tử trong slice<a hidden class="anchor" aria-hidden="true" href="#1-kiểm-tra-sự-xuất-hiện-của-một-phần-tử-trong-slice">#</a></h3>
 <p>Type parameter hay generic là một tính năng mới xuất hiện từ phiên bản 1.18 của Go. Với generic, ta có thể viết các hàm hoặc type có thể dùng được cho nhiều kiểu dữ liệu đầu vào khác nhau mà không cần phải lặp lại code nhiều lần.<br>
 Hãy bắt đầu với một ví dụ đơn giản và phổ biến: Kiểm tra xem string có xuất hiện trong slice hay không</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">StringSliceContains</span>(<span style="color:#a6e22e">ss</span> []<span style="color:#66d9ef">string</span>, <span style="color:#a6e22e">match</span> <span style="color:#66d9ef">string</span>) <span style="color:#66d9ef">bool</span> {
-	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">s</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">ss</span> {
-		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">s</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">match</span> {
-			<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">true</span>
-		}
-	}
-	<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>
-}
-</code></pre></div><p>Rõ ràng là trong quá trình sử dụng thực tế, ta sẽ gặp các usecase tương tự với các kiểu dữ liệu khác. Trước khi có generic, việc phổ biến nhất sẽ là viết riêng các hàm cụ thể cho từng kiểu dữ liệu <code>IntSliceContains()</code>, <code>Int64SliceContains()</code>&hellip; bên cạnh việc sử dụng code generation hay reflection.<br>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">StringSliceContains</span>(<span style="color:#a6e22e">ss</span> []<span style="color:#66d9ef">string</span>, <span style="color:#a6e22e">match</span> <span style="color:#66d9ef">string</span>) <span style="color:#66d9ef">bool</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">s</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">ss</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">s</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">match</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Rõ ràng là trong quá trình sử dụng thực tế, ta sẽ gặp các usecase tương tự với các kiểu dữ liệu khác. Trước khi có generic, việc phổ biến nhất sẽ là viết riêng các hàm cụ thể cho từng kiểu dữ liệu <code>IntSliceContains()</code>, <code>Int64SliceContains()</code>&hellip; bên cạnh việc sử dụng code generation hay reflection.<br>
 Có thể thấy các hàm này đều lặp lại một logic giống nhau, chỉ khác ở kiểu dữ liệu đầu vào, với generic, ta hoàn toàn có thể rút gọn lại các hàm này lại thành một, rất gọn và dễ dàng bảo trì về sau:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">SliceContains</span>[<span style="color:#a6e22e">T</span> <span style="color:#a6e22e">comparable</span>](<span style="color:#a6e22e">ss</span> []<span style="color:#a6e22e">T</span>, <span style="color:#a6e22e">match</span> <span style="color:#a6e22e">T</span>) <span style="color:#66d9ef">bool</span> {
-	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">s</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">ss</span> {
-		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">s</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">match</span> {
-			<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">true</span>
-		}
-	}
-	<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>
-}
-</code></pre></div><p>Giải thích:<br>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">SliceContains</span>[<span style="color:#a6e22e">T</span> <span style="color:#a6e22e">comparable</span>](<span style="color:#a6e22e">ss</span> []<span style="color:#a6e22e">T</span>, <span style="color:#a6e22e">match</span> <span style="color:#a6e22e">T</span>) <span style="color:#66d9ef">bool</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">s</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">ss</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">s</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">match</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Giải thích:<br>
 <code>[T comparable]</code> được gọi là type parameter và có thể sử dụng được với một <code>func</code> hoặc một <code>type</code>, trong trường hợp này ám chỉ việc hàm <code>SliceContains</code> có thể nhận vào đầu vào kiểu T thỏa mãn ràng buộc <code>comparable</code>.<br>
 Ràng buộc ở đây là một interface mà T cần thỏa mãn, interface này có thể chứa method signature thường thấy hoặc tập hợp các type bất kì, xem thêm <a href="https://pkg.go.dev/golang.org/x/exp/constraints">package constraints</a>.<br>
 Ta hoàn toàn có thể  định nghĩa constraints cùa riêng mình.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">MyConstraint</span> <span style="color:#66d9ef">interface</span> {
-    <span style="color:#960050;background-color:#1e0010">~</span><span style="color:#66d9ef">int</span> | <span style="color:#960050;background-color:#1e0010">~</span><span style="color:#66d9ef">string</span>
-}
-
-<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">SliceContains</span>[<span style="color:#a6e22e">T</span> <span style="color:#a6e22e">MyConstraint</span>](<span style="color:#a6e22e">ss</span> []<span style="color:#a6e22e">T</span>, <span style="color:#a6e22e">match</span> <span style="color:#a6e22e">T</span>) <span style="color:#66d9ef">bool</span> {
-	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">s</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">ss</span> {
-		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">s</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">match</span> {
-			<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">true</span>
-		}
-	}
-	<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>
-}
-</code></pre></div><p>Như ví dụ trên đây, T cần là <code>int</code> hoặc <code>string</code>, toán tử <code>~</code> tức ràng buộc thỏa mãn với cả các kiểu được định nghĩa từ <code>int</code> hoặc <code>string</code> (ví dụ <code>type Name string</code>, <code>type Age int</code>)</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">TestSliceContains</span>(<span style="color:#a6e22e">t</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">testing</span>.<span style="color:#a6e22e">T</span>) {
-	<span style="color:#a6e22e">intSlice</span> <span style="color:#f92672">:=</span> []<span style="color:#66d9ef">int</span>{<span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">6</span>}
-	<span style="color:#a6e22e">stringSlice</span> <span style="color:#f92672">:=</span> []<span style="color:#66d9ef">string</span>{<span style="color:#e6db74">&#34;a&#34;</span>, <span style="color:#e6db74">&#34;abb&#34;</span>, <span style="color:#e6db74">&#34;c&#34;</span>}
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#a6e22e">SliceContains</span>(<span style="color:#a6e22e">intSlice</span>, <span style="color:#ae81ff">5</span>)) <span style="color:#75715e">// true
-</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#a6e22e">SliceContains</span>(<span style="color:#a6e22e">stringSlice</span>, <span style="color:#e6db74">&#34;c&#34;</span>)) <span style="color:#75715e">// true
-</span><span style="color:#75715e"></span>}
-</code></pre></div><p>Có thể thấy là khi gọi hàm không cần chỉ rõ ra T là kiểu gì mà chỉ cần truyền các parameter vào, go có thể tự hiểu và thực thi đúng hàm mà ta mong muốn, <code>SliceContains[int](intSlice, 5)</code> cũng tương đương với <code>SliceContains(intSlice, 5)</code>.<br>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">MyConstraint</span> <span style="color:#66d9ef">interface</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">~</span><span style="color:#66d9ef">int</span> | <span style="color:#960050;background-color:#1e0010">~</span><span style="color:#66d9ef">string</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">SliceContains</span>[<span style="color:#a6e22e">T</span> <span style="color:#a6e22e">MyConstraint</span>](<span style="color:#a6e22e">ss</span> []<span style="color:#a6e22e">T</span>, <span style="color:#a6e22e">match</span> <span style="color:#a6e22e">T</span>) <span style="color:#66d9ef">bool</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">s</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">ss</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">s</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">match</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Như ví dụ trên đây, T cần là <code>int</code> hoặc <code>string</code>, toán tử <code>~</code> tức ràng buộc thỏa mãn với cả các kiểu được định nghĩa từ <code>int</code> hoặc <code>string</code> (ví dụ <code>type Name string</code>, <code>type Age int</code>)</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">TestSliceContains</span>(<span style="color:#a6e22e">t</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">testing</span>.<span style="color:#a6e22e">T</span>) {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">intSlice</span> <span style="color:#f92672">:=</span> []<span style="color:#66d9ef">int</span>{<span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">6</span>}
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">stringSlice</span> <span style="color:#f92672">:=</span> []<span style="color:#66d9ef">string</span>{<span style="color:#e6db74">&#34;a&#34;</span>, <span style="color:#e6db74">&#34;abb&#34;</span>, <span style="color:#e6db74">&#34;c&#34;</span>}
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#a6e22e">SliceContains</span>(<span style="color:#a6e22e">intSlice</span>, <span style="color:#ae81ff">5</span>)) <span style="color:#75715e">// true
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#a6e22e">SliceContains</span>(<span style="color:#a6e22e">stringSlice</span>, <span style="color:#e6db74">&#34;c&#34;</span>)) <span style="color:#75715e">// true
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span></code></pre></div><p>Có thể thấy là khi gọi hàm không cần chỉ rõ ra T là kiểu gì mà chỉ cần truyền các parameter vào, go có thể tự hiểu và thực thi đúng hàm mà ta mong muốn, <code>SliceContains[int](intSlice, 5)</code> cũng tương đương với <code>SliceContains(intSlice, 5)</code>.<br>
 Ta cũng có thể viết một hàm kiểm tra phần tử có thuộc slice hay không mà không có ràng buộc, thay vào đó, truyền vào một funcion <code>equalFunc</code> để sử dụng thay cho toán tử <code>==</code>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">SliceContainsWithEqual</span>[<span style="color:#a6e22e">T</span> <span style="color:#a6e22e">any</span>](<span style="color:#a6e22e">ss</span> []<span style="color:#a6e22e">T</span>, <span style="color:#a6e22e">match</span> <span style="color:#a6e22e">T</span>, <span style="color:#a6e22e">equalFunc</span> <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">T</span>, <span style="color:#a6e22e">T</span>) <span style="color:#66d9ef">bool</span>) <span style="color:#66d9ef">bool</span> {
-	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">s</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">ss</span> {
-		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">equalFunc</span>(<span style="color:#a6e22e">s</span>, <span style="color:#a6e22e">match</span>) {
-			<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">true</span>
-		}
-	}
-	<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>
-}
-</code></pre></div><h3 id="2-generic-wrapper-cho-containerheap">2. Generic wrapper cho container/heap<a hidden class="anchor" aria-hidden="true" href="#2-generic-wrapper-cho-containerheap">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">SliceContainsWithEqual</span>[<span style="color:#a6e22e">T</span> <span style="color:#a6e22e">any</span>](<span style="color:#a6e22e">ss</span> []<span style="color:#a6e22e">T</span>, <span style="color:#a6e22e">match</span> <span style="color:#a6e22e">T</span>, <span style="color:#a6e22e">equalFunc</span> <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">T</span>, <span style="color:#a6e22e">T</span>) <span style="color:#66d9ef">bool</span>) <span style="color:#66d9ef">bool</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">s</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">ss</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">equalFunc</span>(<span style="color:#a6e22e">s</span>, <span style="color:#a6e22e">match</span>) {
+</span></span><span style="display:flex;"><span>			<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="2-generic-wrapper-cho-containerheap">2. Generic wrapper cho container/heap<a hidden class="anchor" aria-hidden="true" href="#2-generic-wrapper-cho-containerheap">#</a></h3>
 <p>Trong go, khi cần sử dụng heap, ta có thể sử dụng package <code>container/heap</code> và implement <code>heap.Interface</code> cho kiểu dữ liệu muốn sử dụng.<br>
 Ví dụ một min heap cho kiểu int từ trong document của <code>container/heap</code>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">IntHeap</span> []<span style="color:#66d9ef">int</span>
-
-<span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">h</span> <span style="color:#a6e22e">IntHeap</span>) <span style="color:#a6e22e">Len</span>() <span style="color:#66d9ef">int</span>           { <span style="color:#66d9ef">return</span> len(<span style="color:#a6e22e">h</span>) }
-<span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">h</span> <span style="color:#a6e22e">IntHeap</span>) <span style="color:#a6e22e">Less</span>(<span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">j</span> <span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">bool</span> { <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">h</span>[<span style="color:#a6e22e">i</span>] &lt; <span style="color:#a6e22e">h</span>[<span style="color:#a6e22e">j</span>] }
-<span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">h</span> <span style="color:#a6e22e">IntHeap</span>) <span style="color:#a6e22e">Swap</span>(<span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">j</span> <span style="color:#66d9ef">int</span>)      { <span style="color:#a6e22e">h</span>[<span style="color:#a6e22e">i</span>], <span style="color:#a6e22e">h</span>[<span style="color:#a6e22e">j</span>] = <span style="color:#a6e22e">h</span>[<span style="color:#a6e22e">j</span>], <span style="color:#a6e22e">h</span>[<span style="color:#a6e22e">i</span>] }
-
-<span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">h</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">IntHeap</span>) <span style="color:#a6e22e">Push</span>(<span style="color:#a6e22e">x</span> <span style="color:#a6e22e">any</span>) {
-	<span style="color:#75715e">// Push and Pop use pointer receivers because they modify the slice&#39;s length,
-</span><span style="color:#75715e"></span>	<span style="color:#75715e">// not just its contents.
-</span><span style="color:#75715e"></span>	<span style="color:#f92672">*</span><span style="color:#a6e22e">h</span> = append(<span style="color:#f92672">*</span><span style="color:#a6e22e">h</span>, <span style="color:#a6e22e">x</span>.(<span style="color:#66d9ef">int</span>))
-}
-
-<span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">h</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">IntHeap</span>) <span style="color:#a6e22e">Pop</span>() <span style="color:#a6e22e">any</span> {
-	<span style="color:#a6e22e">old</span> <span style="color:#f92672">:=</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">h</span>
-	<span style="color:#a6e22e">n</span> <span style="color:#f92672">:=</span> len(<span style="color:#a6e22e">old</span>)
-	<span style="color:#a6e22e">x</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">old</span>[<span style="color:#a6e22e">n</span><span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>]
-	<span style="color:#f92672">*</span><span style="color:#a6e22e">h</span> = <span style="color:#a6e22e">old</span>[<span style="color:#ae81ff">0</span> : <span style="color:#a6e22e">n</span><span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>]
-	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">x</span>
-}
-</code></pre></div><p>Trong nhiều trường hợp, ta chỉ quan tâm tới kiểu dữ liệu và method <code>Less</code>, còn cách triền khai tương tự như ví dụ trên.<br>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">IntHeap</span> []<span style="color:#66d9ef">int</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">h</span> <span style="color:#a6e22e">IntHeap</span>) <span style="color:#a6e22e">Len</span>() <span style="color:#66d9ef">int</span>           { <span style="color:#66d9ef">return</span> len(<span style="color:#a6e22e">h</span>) }
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">h</span> <span style="color:#a6e22e">IntHeap</span>) <span style="color:#a6e22e">Less</span>(<span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">j</span> <span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">bool</span> { <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">h</span>[<span style="color:#a6e22e">i</span>] &lt; <span style="color:#a6e22e">h</span>[<span style="color:#a6e22e">j</span>] }
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">h</span> <span style="color:#a6e22e">IntHeap</span>) <span style="color:#a6e22e">Swap</span>(<span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">j</span> <span style="color:#66d9ef">int</span>)      { <span style="color:#a6e22e">h</span>[<span style="color:#a6e22e">i</span>], <span style="color:#a6e22e">h</span>[<span style="color:#a6e22e">j</span>] = <span style="color:#a6e22e">h</span>[<span style="color:#a6e22e">j</span>], <span style="color:#a6e22e">h</span>[<span style="color:#a6e22e">i</span>] }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">h</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">IntHeap</span>) <span style="color:#a6e22e">Push</span>(<span style="color:#a6e22e">x</span> <span style="color:#a6e22e">any</span>) {
+</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// Push and Pop use pointer receivers because they modify the slice&#39;s length,
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#75715e">// not just its contents.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#f92672">*</span><span style="color:#a6e22e">h</span> = append(<span style="color:#f92672">*</span><span style="color:#a6e22e">h</span>, <span style="color:#a6e22e">x</span>.(<span style="color:#66d9ef">int</span>))
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">h</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">IntHeap</span>) <span style="color:#a6e22e">Pop</span>() <span style="color:#a6e22e">any</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">old</span> <span style="color:#f92672">:=</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">h</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">n</span> <span style="color:#f92672">:=</span> len(<span style="color:#a6e22e">old</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">x</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">old</span>[<span style="color:#a6e22e">n</span><span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>	<span style="color:#f92672">*</span><span style="color:#a6e22e">h</span> = <span style="color:#a6e22e">old</span>[<span style="color:#ae81ff">0</span> : <span style="color:#a6e22e">n</span><span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">x</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Trong nhiều trường hợp, ta chỉ quan tâm tới kiểu dữ liệu và method <code>Less</code>, còn cách triền khai tương tự như ví dụ trên.<br>
 Có thể dùng type parameter để đơn giản hóa việc sử dụng heap như sau:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Heap</span>[<span style="color:#a6e22e">T</span> <span style="color:#a6e22e">any</span>] <span style="color:#66d9ef">struct</span> {
-	<span style="color:#a6e22e">data</span>     []<span style="color:#a6e22e">T</span>
-	<span style="color:#a6e22e">lessFunc</span> <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">b</span> <span style="color:#a6e22e">T</span>) <span style="color:#66d9ef">bool</span>
-}
-
-<span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">b</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">Heap</span>[<span style="color:#a6e22e">T</span>]) <span style="color:#a6e22e">Len</span>() <span style="color:#66d9ef">int</span> {
-	<span style="color:#66d9ef">return</span> len(<span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span>)
-}
-
-<span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">b</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">Heap</span>[<span style="color:#a6e22e">T</span>]) <span style="color:#a6e22e">Less</span>(<span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">j</span> <span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">bool</span> {
-	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">lessFunc</span>(<span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">i</span>], <span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">j</span>])
-}
-
-<span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">b</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">Heap</span>[<span style="color:#a6e22e">T</span>]) <span style="color:#a6e22e">Swap</span>(<span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">j</span> <span style="color:#66d9ef">int</span>) {
-	<span style="color:#a6e22e">tmp</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">i</span>]
-	<span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">i</span>] = <span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">j</span>]
-	<span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">j</span>] = <span style="color:#a6e22e">tmp</span>
-}
-
-<span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">b</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">Heap</span>[<span style="color:#a6e22e">T</span>]) <span style="color:#a6e22e">Push</span>(<span style="color:#a6e22e">x</span> <span style="color:#a6e22e">any</span>) {
-	<span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span> = append(<span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span>, <span style="color:#a6e22e">x</span>.(<span style="color:#a6e22e">T</span>))
-}
-
-<span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">b</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">Heap</span>[<span style="color:#a6e22e">T</span>]) <span style="color:#a6e22e">Pop</span>() <span style="color:#a6e22e">any</span> {
-	<span style="color:#a6e22e">old</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span>
-	<span style="color:#a6e22e">oldLen</span> <span style="color:#f92672">:=</span> len(<span style="color:#a6e22e">old</span>)
-	<span style="color:#a6e22e">res</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">old</span>[<span style="color:#a6e22e">oldLen</span><span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>]
-	<span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span> = <span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span>[:<span style="color:#a6e22e">oldLen</span><span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>]
-	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">res</span>
-}
-
-<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">New</span>[<span style="color:#a6e22e">T</span> <span style="color:#a6e22e">any</span>](<span style="color:#a6e22e">lessFunc</span> <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">T</span>, <span style="color:#a6e22e">T</span>) <span style="color:#66d9ef">bool</span>) <span style="color:#f92672">*</span><span style="color:#a6e22e">Heap</span>[<span style="color:#a6e22e">T</span>] {
-	<span style="color:#a6e22e">h</span> <span style="color:#f92672">:=</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">Heap</span>[<span style="color:#a6e22e">T</span>]{
-		<span style="color:#a6e22e">lessFunc</span>: <span style="color:#a6e22e">lessFunc</span>,
-	}
-	<span style="color:#a6e22e">heap</span>.<span style="color:#a6e22e">Init</span>(<span style="color:#a6e22e">h</span>)
-	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">h</span>
-}
-</code></pre></div><p>Type parameter cũng có thể sử dụng với <code>type</code> như trong ví dụ này.
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Heap</span>[<span style="color:#a6e22e">T</span> <span style="color:#a6e22e">any</span>] <span style="color:#66d9ef">struct</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">data</span>     []<span style="color:#a6e22e">T</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">lessFunc</span> <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">b</span> <span style="color:#a6e22e">T</span>) <span style="color:#66d9ef">bool</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">b</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">Heap</span>[<span style="color:#a6e22e">T</span>]) <span style="color:#a6e22e">Len</span>() <span style="color:#66d9ef">int</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> len(<span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">b</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">Heap</span>[<span style="color:#a6e22e">T</span>]) <span style="color:#a6e22e">Less</span>(<span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">j</span> <span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">bool</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">lessFunc</span>(<span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">i</span>], <span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">j</span>])
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">b</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">Heap</span>[<span style="color:#a6e22e">T</span>]) <span style="color:#a6e22e">Swap</span>(<span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">j</span> <span style="color:#66d9ef">int</span>) {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">tmp</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">i</span>]
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">i</span>] = <span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">j</span>]
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">j</span>] = <span style="color:#a6e22e">tmp</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">b</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">Heap</span>[<span style="color:#a6e22e">T</span>]) <span style="color:#a6e22e">Push</span>(<span style="color:#a6e22e">x</span> <span style="color:#a6e22e">any</span>) {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span> = append(<span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span>, <span style="color:#a6e22e">x</span>.(<span style="color:#a6e22e">T</span>))
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">b</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">Heap</span>[<span style="color:#a6e22e">T</span>]) <span style="color:#a6e22e">Pop</span>() <span style="color:#a6e22e">any</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">old</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">oldLen</span> <span style="color:#f92672">:=</span> len(<span style="color:#a6e22e">old</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">res</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">old</span>[<span style="color:#a6e22e">oldLen</span><span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span> = <span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span>[:<span style="color:#a6e22e">oldLen</span><span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">res</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">New</span>[<span style="color:#a6e22e">T</span> <span style="color:#a6e22e">any</span>](<span style="color:#a6e22e">lessFunc</span> <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">T</span>, <span style="color:#a6e22e">T</span>) <span style="color:#66d9ef">bool</span>) <span style="color:#f92672">*</span><span style="color:#a6e22e">Heap</span>[<span style="color:#a6e22e">T</span>] {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">h</span> <span style="color:#f92672">:=</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">Heap</span>[<span style="color:#a6e22e">T</span>]{
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">lessFunc</span>: <span style="color:#a6e22e">lessFunc</span>,
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">heap</span>.<span style="color:#a6e22e">Init</span>(<span style="color:#a6e22e">h</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">h</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Type parameter cũng có thể sử dụng với <code>type</code> như trong ví dụ này.
 Mấu chốt trong cách triển khai này chính là lưu lại <code>lessFunc</code> trong struct <code>Heap</code>, do ta không thể thay đổi method <code>Less</code> tại runtime, thay vào đó <code>Less</code> sẽ gọi vào hàm được lưu trong receiver.<br>
 Tuy nhiên có thể thấy rằng kiểu của các method như <code>Push</code> hay <code>Pop</code> lại là <code>any</code> và để đảm bảo implement <code>heap.Interface</code>, ta không thể sửa signature của các method này. Ngoài ra, việc gọi trực tiếp <code>*Heap.Pop</code> thay vì <code>heap.Pop(*Heap)</code>, và <code>*Heap.Push(T)</code> thay vì <code>heap.Push(*Heap, T)</code> sẽ gây ra kết quả sai, thay vào đó nên tránh cho phép gọi trực tiếp các method này.  <br>
 Ta sẽ wrap type mà implement heap interface trong một public Type mà sẽ nhận và trả về kết quả mong muốn:<br>
 Chuyển triển khai trên thành một unexported struct với tên <code>base</code>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">base</span>[<span style="color:#a6e22e">T</span> <span style="color:#a6e22e">any</span>] <span style="color:#66d9ef">struct</span> {
-	<span style="color:#a6e22e">data</span>     []<span style="color:#a6e22e">T</span>
-	<span style="color:#a6e22e">lessFunc</span> <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">b</span> <span style="color:#a6e22e">T</span>) <span style="color:#66d9ef">bool</span>
-}
-
-<span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">b</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">base</span>[<span style="color:#a6e22e">T</span>]) <span style="color:#a6e22e">Len</span>() <span style="color:#66d9ef">int</span> {
-	<span style="color:#66d9ef">return</span> len(<span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span>)
-}
-
-<span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">b</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">base</span>[<span style="color:#a6e22e">T</span>]) <span style="color:#a6e22e">Less</span>(<span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">j</span> <span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">bool</span> {
-	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">lessFunc</span>(<span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">i</span>], <span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">j</span>])
-}
-
-<span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">b</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">base</span>[<span style="color:#a6e22e">T</span>]) <span style="color:#a6e22e">Swap</span>(<span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">j</span> <span style="color:#66d9ef">int</span>) {
-	<span style="color:#a6e22e">tmp</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">i</span>]
-	<span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">i</span>] = <span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">j</span>]
-	<span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">j</span>] = <span style="color:#a6e22e">tmp</span>
-}
-
-<span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">b</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">base</span>[<span style="color:#a6e22e">T</span>]) <span style="color:#a6e22e">Push</span>(<span style="color:#a6e22e">x</span> <span style="color:#a6e22e">any</span>) {
-	<span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span> = append(<span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span>, <span style="color:#a6e22e">x</span>.(<span style="color:#a6e22e">T</span>))
-}
-
-<span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">b</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">base</span>[<span style="color:#a6e22e">T</span>]) <span style="color:#a6e22e">Pop</span>() <span style="color:#a6e22e">any</span> {
-	<span style="color:#a6e22e">old</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span>
-	<span style="color:#a6e22e">oldLen</span> <span style="color:#f92672">:=</span> len(<span style="color:#a6e22e">old</span>)
-	<span style="color:#a6e22e">res</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">old</span>[<span style="color:#a6e22e">oldLen</span><span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>]
-	<span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span> = <span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span>[:<span style="color:#a6e22e">oldLen</span><span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>]
-	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">res</span>
-}
-</code></pre></div><p>Và viết thêm một genetic type với các method mà ta mong muốn:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Heap</span>[<span style="color:#a6e22e">T</span> <span style="color:#a6e22e">any</span>] <span style="color:#66d9ef">struct</span> {
-	<span style="color:#a6e22e">base</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">base</span>[<span style="color:#a6e22e">T</span>]
-}
-
-<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">New</span>[<span style="color:#a6e22e">T</span> <span style="color:#a6e22e">any</span>](<span style="color:#a6e22e">lessFunc</span> <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">T</span>, <span style="color:#a6e22e">T</span>) <span style="color:#66d9ef">bool</span>) <span style="color:#f92672">*</span><span style="color:#a6e22e">Heap</span>[<span style="color:#a6e22e">T</span>] {
-	<span style="color:#a6e22e">b</span> <span style="color:#f92672">:=</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">base</span>[<span style="color:#a6e22e">T</span>]{
-		<span style="color:#a6e22e">lessFunc</span>: <span style="color:#a6e22e">lessFunc</span>,
-	}
-	<span style="color:#a6e22e">heap</span>.<span style="color:#a6e22e">Init</span>(<span style="color:#a6e22e">b</span>)
-	<span style="color:#66d9ef">return</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">Heap</span>[<span style="color:#a6e22e">T</span>]{<span style="color:#a6e22e">base</span>: <span style="color:#a6e22e">b</span>}
-}
-
-<span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">h</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">Heap</span>[<span style="color:#a6e22e">T</span>]) <span style="color:#a6e22e">Push</span>(<span style="color:#a6e22e">t</span> <span style="color:#a6e22e">T</span>) {
-	<span style="color:#a6e22e">heap</span>.<span style="color:#a6e22e">Push</span>(<span style="color:#a6e22e">h</span>.<span style="color:#a6e22e">base</span>, <span style="color:#a6e22e">t</span>)
-}
-
-<span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">h</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">Heap</span>[<span style="color:#a6e22e">T</span>]) <span style="color:#a6e22e">Pop</span>() <span style="color:#a6e22e">T</span> {
-	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">h</span>.<span style="color:#a6e22e">Len</span>() <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> { <span style="color:#75715e">// thêm validate cho Pop
-</span><span style="color:#75715e"></span>		<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">t</span> <span style="color:#a6e22e">T</span>
-		<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">t</span>
-	}
-	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">heap</span>.<span style="color:#a6e22e">Pop</span>(<span style="color:#a6e22e">h</span>.<span style="color:#a6e22e">base</span>).(<span style="color:#a6e22e">T</span>) <span style="color:#75715e">// chuyển đổi kiểu trả về cho đúng
-</span><span style="color:#75715e"></span>}
-
-<span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">h</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">Heap</span>[<span style="color:#a6e22e">T</span>]) <span style="color:#a6e22e">Len</span>() <span style="color:#66d9ef">int</span> {
-	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">h</span>.<span style="color:#a6e22e">base</span>.<span style="color:#a6e22e">Len</span>()
-}
-</code></pre></div><p>Chạy thử:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">TestGenericHeap</span>(<span style="color:#a6e22e">t</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">testing</span>.<span style="color:#a6e22e">T</span>) {
-	<span style="color:#a6e22e">data</span> <span style="color:#f92672">:=</span> []<span style="color:#66d9ef">int</span>{<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">2</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">8</span>, <span style="color:#ae81ff">9</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">10</span>}
-	<span style="color:#a6e22e">lessFunc</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">j</span> <span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">bool</span> {
-		<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">j</span><span style="color:#f92672">-</span><span style="color:#a6e22e">i</span> &gt; <span style="color:#ae81ff">0</span>
-	}
-	<span style="color:#a6e22e">heap</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">New</span>(<span style="color:#a6e22e">lessFunc</span>)
-	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">v</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">data</span> {
-		<span style="color:#a6e22e">heap</span>.<span style="color:#a6e22e">Push</span>(<span style="color:#a6e22e">v</span>)
-	}
-	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">heap</span>.<span style="color:#a6e22e">Len</span>() &gt; <span style="color:#ae81ff">0</span> {
-		<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Print</span>(<span style="color:#a6e22e">heap</span>.<span style="color:#a6e22e">Pop</span>(), <span style="color:#e6db74">&#34; &#34;</span>)
-	}
-}
-</code></pre></div><p>Kết quả:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">base</span>[<span style="color:#a6e22e">T</span> <span style="color:#a6e22e">any</span>] <span style="color:#66d9ef">struct</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">data</span>     []<span style="color:#a6e22e">T</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">lessFunc</span> <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">b</span> <span style="color:#a6e22e">T</span>) <span style="color:#66d9ef">bool</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">b</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">base</span>[<span style="color:#a6e22e">T</span>]) <span style="color:#a6e22e">Len</span>() <span style="color:#66d9ef">int</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> len(<span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">b</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">base</span>[<span style="color:#a6e22e">T</span>]) <span style="color:#a6e22e">Less</span>(<span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">j</span> <span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">bool</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">lessFunc</span>(<span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">i</span>], <span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">j</span>])
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">b</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">base</span>[<span style="color:#a6e22e">T</span>]) <span style="color:#a6e22e">Swap</span>(<span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">j</span> <span style="color:#66d9ef">int</span>) {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">tmp</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">i</span>]
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">i</span>] = <span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">j</span>]
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span>[<span style="color:#a6e22e">j</span>] = <span style="color:#a6e22e">tmp</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">b</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">base</span>[<span style="color:#a6e22e">T</span>]) <span style="color:#a6e22e">Push</span>(<span style="color:#a6e22e">x</span> <span style="color:#a6e22e">any</span>) {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span> = append(<span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span>, <span style="color:#a6e22e">x</span>.(<span style="color:#a6e22e">T</span>))
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">b</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">base</span>[<span style="color:#a6e22e">T</span>]) <span style="color:#a6e22e">Pop</span>() <span style="color:#a6e22e">any</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">old</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">oldLen</span> <span style="color:#f92672">:=</span> len(<span style="color:#a6e22e">old</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">res</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">old</span>[<span style="color:#a6e22e">oldLen</span><span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span> = <span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">data</span>[:<span style="color:#a6e22e">oldLen</span><span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">res</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Và viết thêm một genetic type với các method mà ta mong muốn:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Heap</span>[<span style="color:#a6e22e">T</span> <span style="color:#a6e22e">any</span>] <span style="color:#66d9ef">struct</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">base</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">base</span>[<span style="color:#a6e22e">T</span>]
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">New</span>[<span style="color:#a6e22e">T</span> <span style="color:#a6e22e">any</span>](<span style="color:#a6e22e">lessFunc</span> <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">T</span>, <span style="color:#a6e22e">T</span>) <span style="color:#66d9ef">bool</span>) <span style="color:#f92672">*</span><span style="color:#a6e22e">Heap</span>[<span style="color:#a6e22e">T</span>] {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">b</span> <span style="color:#f92672">:=</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">base</span>[<span style="color:#a6e22e">T</span>]{
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">lessFunc</span>: <span style="color:#a6e22e">lessFunc</span>,
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">heap</span>.<span style="color:#a6e22e">Init</span>(<span style="color:#a6e22e">b</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">Heap</span>[<span style="color:#a6e22e">T</span>]{<span style="color:#a6e22e">base</span>: <span style="color:#a6e22e">b</span>}
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">h</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">Heap</span>[<span style="color:#a6e22e">T</span>]) <span style="color:#a6e22e">Push</span>(<span style="color:#a6e22e">t</span> <span style="color:#a6e22e">T</span>) {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">heap</span>.<span style="color:#a6e22e">Push</span>(<span style="color:#a6e22e">h</span>.<span style="color:#a6e22e">base</span>, <span style="color:#a6e22e">t</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">h</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">Heap</span>[<span style="color:#a6e22e">T</span>]) <span style="color:#a6e22e">Pop</span>() <span style="color:#a6e22e">T</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">h</span>.<span style="color:#a6e22e">Len</span>() <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> { <span style="color:#75715e">// thêm validate cho Pop
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>		<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">t</span> <span style="color:#a6e22e">T</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">t</span>
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">heap</span>.<span style="color:#a6e22e">Pop</span>(<span style="color:#a6e22e">h</span>.<span style="color:#a6e22e">base</span>).(<span style="color:#a6e22e">T</span>) <span style="color:#75715e">// chuyển đổi kiểu trả về cho đúng
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">h</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">Heap</span>[<span style="color:#a6e22e">T</span>]) <span style="color:#a6e22e">Len</span>() <span style="color:#66d9ef">int</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">h</span>.<span style="color:#a6e22e">base</span>.<span style="color:#a6e22e">Len</span>()
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Chạy thử:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">TestGenericHeap</span>(<span style="color:#a6e22e">t</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">testing</span>.<span style="color:#a6e22e">T</span>) {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">data</span> <span style="color:#f92672">:=</span> []<span style="color:#66d9ef">int</span>{<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">2</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">8</span>, <span style="color:#ae81ff">9</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">10</span>}
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">lessFunc</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">j</span> <span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">bool</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">j</span><span style="color:#f92672">-</span><span style="color:#a6e22e">i</span> &gt; <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">heap</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">New</span>(<span style="color:#a6e22e">lessFunc</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">v</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">data</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">heap</span>.<span style="color:#a6e22e">Push</span>(<span style="color:#a6e22e">v</span>)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">heap</span>.<span style="color:#a6e22e">Len</span>() &gt; <span style="color:#ae81ff">0</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Print</span>(<span style="color:#a6e22e">heap</span>.<span style="color:#a6e22e">Pop</span>(), <span style="color:#e6db74">&#34; &#34;</span>)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Kết quả:</p>
 <pre tabindex="0"><code>-10 -5 0 2 4 5 8 9
 </code></pre><p>Clear hơn khá nhiều phải không? Có thể xem code đầy đủ tại <a href="https://github.com/DucHoangManh/generic-heap">đây</a></p>
 <h3 id="3-khi-nào-dùng-type-parameter">3. Khi nào dùng type parameter?<a hidden class="anchor" aria-hidden="true" href="#3-khi-nào-dùng-type-parameter">#</a></h3>
@@ -423,18 +422,18 @@ Chuyển triển khai trên thành một unexported struct với tên <code>base
 <li>Khi dùng type parameter chỉ để gọi method của constraints thì không nên dùng type parameter mà nên dùng hàm bình thường nhận vào interface.
 thay vì</li>
 </ul>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">foo</span>[<span style="color:#a6e22e">T</span> <span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">Writer</span>](<span style="color:#a6e22e">w</span> <span style="color:#a6e22e">T</span>) {
-    <span style="color:#f92672">...</span>
-    <span style="color:#a6e22e">w</span>.<span style="color:#a6e22e">Write</span><span style="color:#f92672">...</span>
-    <span style="color:#f92672">...</span>
-}
-</code></pre></div><p>tốt hơn là</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">foo</span>(<span style="color:#a6e22e">w</span> <span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">Writer</span>) {
-    <span style="color:#f92672">...</span>
-    <span style="color:#a6e22e">w</span>.<span style="color:#a6e22e">Write</span><span style="color:#f92672">...</span>
-    <span style="color:#f92672">...</span>
-}
-</code></pre></div><p>như cách mà nó vẫn được viết từ trước khi go có generic.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">foo</span>[<span style="color:#a6e22e">T</span> <span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">Writer</span>](<span style="color:#a6e22e">w</span> <span style="color:#a6e22e">T</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">...</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">w</span>.<span style="color:#a6e22e">Write</span><span style="color:#f92672">...</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">...</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>tốt hơn là</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">foo</span>(<span style="color:#a6e22e">w</span> <span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">Writer</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">...</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">w</span>.<span style="color:#a6e22e">Write</span><span style="color:#f92672">...</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">...</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>như cách mà nó vẫn được viết từ trước khi go có generic.</p>
 <ul>
 <li>Và trong nhiều trường hợp, việc sử dụng type parameter có thể ảnh hưởng nhiều đến tính dễ bảo trì của code, hãy cân nhắc sử dụng các phương pháp khác đã nêu ở phần 1. Hãy nhớ là go developer vẫn sống (khá) tốt trong một thời gian dài mà không có generic (◍•ᴗ•◍)👍.</li>
 </ul>
@@ -450,12 +449,12 @@ thay vì</li>
     </ul>
 <nav class="paginav">
   <a class="prev" href="https://duchoangmanh.github.io/posts/technical/go-reflection-qua-vi-du/">
-    <span class="title">« Prev Page</span>
+    <span class="title">« Prev</span>
     <br>
     <span>Go: Giới thiệu về reflection qua ví dụ</span>
   </a>
   <a class="next" href="https://duchoangmanh.github.io/posts/technical/go-tips-and-optimization-notes/">
-    <span class="title">Next Page »</span>
+    <span class="title">Next »</span>
     <br>
     <span>Go tips and optimization notes</span>
   </a>
@@ -465,58 +464,57 @@ thay vì</li>
 <div class="share-buttons">
     <a target="_blank" rel="noopener noreferrer" aria-label="share Go: Giới thiệu về type parameter (generic) qua ví dụ on twitter"
         href="https://twitter.com/intent/tweet/?text=Go%3a%20Gi%e1%bb%9bi%20thi%e1%bb%87u%20v%e1%bb%81%20type%20parameter%20%28generic%29%20qua%20v%c3%ad%20d%e1%bb%a5&amp;url=https%3a%2f%2fduchoangmanh.github.io%2fposts%2ftechnical%2fgo-gioi-thieu-type-parameter-qua-vi-du%2f&amp;hashtags=go%2cefective-go%2cgeneric">
-        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
             <path
                 d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-253.927,424.544c135.939,0 210.268,-112.643 210.268,-210.268c0,-3.218 0,-6.437 -0.153,-9.502c14.406,-10.421 26.973,-23.448 36.935,-38.314c-13.18,5.824 -27.433,9.809 -42.452,11.648c15.326,-9.196 26.973,-23.602 32.49,-40.92c-14.252,8.429 -30.038,14.56 -46.896,17.931c-13.487,-14.406 -32.644,-23.295 -53.946,-23.295c-40.767,0 -73.87,33.104 -73.87,73.87c0,5.824 0.613,11.494 1.992,16.858c-61.456,-3.065 -115.862,-32.49 -152.337,-77.241c-6.284,10.881 -9.962,23.601 -9.962,37.088c0,25.594 13.027,48.276 32.95,61.456c-12.107,-0.307 -23.448,-3.678 -33.41,-9.196l0,0.92c0,35.862 25.441,65.594 59.311,72.49c-6.13,1.686 -12.72,2.606 -19.464,2.606c-4.751,0 -9.348,-0.46 -13.946,-1.38c9.349,29.426 36.628,50.728 68.965,51.341c-25.287,19.771 -57.164,31.571 -91.8,31.571c-5.977,0 -11.801,-0.306 -17.625,-1.073c32.337,21.15 71.264,33.41 112.95,33.41Z" />
         </svg>
     </a>
     <a target="_blank" rel="noopener noreferrer" aria-label="share Go: Giới thiệu về type parameter (generic) qua ví dụ on linkedin"
         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fduchoangmanh.github.io%2fposts%2ftechnical%2fgo-gioi-thieu-type-parameter-qua-vi-du%2f&amp;title=Go%3a%20Gi%e1%bb%9bi%20thi%e1%bb%87u%20v%e1%bb%81%20type%20parameter%20%28generic%29%20qua%20v%c3%ad%20d%e1%bb%a5&amp;summary=Go%3a%20Gi%e1%bb%9bi%20thi%e1%bb%87u%20v%e1%bb%81%20type%20parameter%20%28generic%29%20qua%20v%c3%ad%20d%e1%bb%a5&amp;source=https%3a%2f%2fduchoangmanh.github.io%2fposts%2ftechnical%2fgo-gioi-thieu-type-parameter-qua-vi-du%2f">
-        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
             <path
                 d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
         </svg>
     </a>
     <a target="_blank" rel="noopener noreferrer" aria-label="share Go: Giới thiệu về type parameter (generic) qua ví dụ on reddit"
         href="https://reddit.com/submit?url=https%3a%2f%2fduchoangmanh.github.io%2fposts%2ftechnical%2fgo-gioi-thieu-type-parameter-qua-vi-du%2f&title=Go%3a%20Gi%e1%bb%9bi%20thi%e1%bb%87u%20v%e1%bb%81%20type%20parameter%20%28generic%29%20qua%20v%c3%ad%20d%e1%bb%a5">
-        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
             <path
                 d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-3.446,265.638c0,-22.964 -18.616,-41.58 -41.58,-41.58c-11.211,0 -21.361,4.457 -28.841,11.666c-28.424,-20.508 -67.586,-33.757 -111.204,-35.278l18.941,-89.121l61.884,13.157c0.756,15.734 13.642,28.29 29.56,28.29c16.407,0 29.706,-13.299 29.706,-29.701c0,-16.403 -13.299,-29.702 -29.706,-29.702c-11.666,0 -21.657,6.792 -26.515,16.578l-69.105,-14.69c-1.922,-0.418 -3.939,-0.042 -5.585,1.036c-1.658,1.073 -2.811,2.761 -3.224,4.686l-21.152,99.438c-44.258,1.228 -84.046,14.494 -112.837,35.232c-7.468,-7.164 -17.589,-11.591 -28.757,-11.591c-22.965,0 -41.585,18.616 -41.585,41.58c0,16.896 10.095,31.41 24.568,37.918c-0.639,4.135 -0.99,8.328 -0.99,12.576c0,63.977 74.469,115.836 166.33,115.836c91.861,0 166.334,-51.859 166.334,-115.836c0,-4.218 -0.347,-8.387 -0.977,-12.493c14.564,-6.47 24.735,-21.034 24.735,-38.001Zm-119.474,108.193c-20.27,20.241 -59.115,21.816 -70.534,21.816c-11.428,0 -50.277,-1.575 -70.522,-21.82c-3.007,-3.008 -3.007,-7.882 0,-10.889c3.003,-2.999 7.882,-3.003 10.885,0c12.777,12.781 40.11,17.317 59.637,17.317c19.522,0 46.86,-4.536 59.657,-17.321c3.016,-2.999 7.886,-2.995 10.885,0.008c3.008,3.011 3.003,7.882 -0.008,10.889Zm-5.23,-48.781c-16.373,0 -29.701,-13.324 -29.701,-29.698c0,-16.381 13.328,-29.714 29.701,-29.714c16.378,0 29.706,13.333 29.706,29.714c0,16.374 -13.328,29.698 -29.706,29.698Zm-160.386,-29.702c0,-16.381 13.328,-29.71 29.714,-29.71c16.369,0 29.689,13.329 29.689,29.71c0,16.373 -13.32,29.693 -29.689,29.693c-16.386,0 -29.714,-13.32 -29.714,-29.693Z" />
         </svg>
     </a>
     <a target="_blank" rel="noopener noreferrer" aria-label="share Go: Giới thiệu về type parameter (generic) qua ví dụ on facebook"
         href="https://facebook.com/sharer/sharer.php?u=https%3a%2f%2fduchoangmanh.github.io%2fposts%2ftechnical%2fgo-gioi-thieu-type-parameter-qua-vi-du%2f">
-        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
             <path
                 d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-106.468,0l0,-192.915l66.6,0l12.672,-82.621l-79.272,0l0,-53.617c0,-22.603 11.073,-44.636 46.58,-44.636l36.042,0l0,-70.34c0,0 -32.71,-5.582 -63.982,-5.582c-65.288,0 -107.96,39.569 -107.96,111.204l0,62.971l-72.573,0l0,82.621l72.573,0l0,192.915l-191.104,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Z" />
         </svg>
     </a>
     <a target="_blank" rel="noopener noreferrer" aria-label="share Go: Giới thiệu về type parameter (generic) qua ví dụ on whatsapp"
         href="https://api.whatsapp.com/send?text=Go%3a%20Gi%e1%bb%9bi%20thi%e1%bb%87u%20v%e1%bb%81%20type%20parameter%20%28generic%29%20qua%20v%c3%ad%20d%e1%bb%a5%20-%20https%3a%2f%2fduchoangmanh.github.io%2fposts%2ftechnical%2fgo-gioi-thieu-type-parameter-qua-vi-du%2f">
-        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
             <path
                 d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-58.673,127.703c-33.842,-33.881 -78.847,-52.548 -126.798,-52.568c-98.799,0 -179.21,80.405 -179.249,179.234c-0.013,31.593 8.241,62.428 23.927,89.612l-25.429,92.884l95.021,-24.925c26.181,14.28 55.659,21.807 85.658,21.816l0.074,0c98.789,0 179.206,-80.413 179.247,-179.243c0.018,-47.895 -18.61,-92.93 -52.451,-126.81Zm-126.797,275.782l-0.06,0c-26.734,-0.01 -52.954,-7.193 -75.828,-20.767l-5.441,-3.229l-56.386,14.792l15.05,-54.977l-3.542,-5.637c-14.913,-23.72 -22.791,-51.136 -22.779,-79.287c0.033,-82.142 66.867,-148.971 149.046,-148.971c39.793,0.014 77.199,15.531 105.329,43.692c28.128,28.16 43.609,65.592 43.594,105.4c-0.034,82.149 -66.866,148.983 -148.983,148.984Zm81.721,-111.581c-4.479,-2.242 -26.499,-13.075 -30.604,-14.571c-4.105,-1.495 -7.091,-2.241 -10.077,2.241c-2.986,4.483 -11.569,14.572 -14.182,17.562c-2.612,2.988 -5.225,3.364 -9.703,1.12c-4.479,-2.241 -18.91,-6.97 -36.017,-22.23c-13.314,-11.876 -22.304,-26.542 -24.916,-31.026c-2.612,-4.484 -0.279,-6.908 1.963,-9.14c2.016,-2.007 4.48,-5.232 6.719,-7.847c2.24,-2.615 2.986,-4.484 4.479,-7.472c1.493,-2.99 0.747,-5.604 -0.374,-7.846c-1.119,-2.241 -10.077,-24.288 -13.809,-33.256c-3.635,-8.733 -7.327,-7.55 -10.077,-7.688c-2.609,-0.13 -5.598,-0.158 -8.583,-0.158c-2.986,0 -7.839,1.121 -11.944,5.604c-4.105,4.484 -15.675,15.32 -15.675,37.364c0,22.046 16.048,43.342 18.287,46.332c2.24,2.99 31.582,48.227 76.511,67.627c10.685,4.615 19.028,7.371 25.533,9.434c10.728,3.41 20.492,2.929 28.209,1.775c8.605,-1.285 26.499,-10.833 30.231,-21.295c3.732,-10.464 3.732,-19.431 2.612,-21.298c-1.119,-1.869 -4.105,-2.99 -8.583,-5.232Z" />
         </svg>
     </a>
     <a target="_blank" rel="noopener noreferrer" aria-label="share Go: Giới thiệu về type parameter (generic) qua ví dụ on telegram"
         href="https://telegram.me/share/url?text=Go%3a%20Gi%e1%bb%9bi%20thi%e1%bb%87u%20v%e1%bb%81%20type%20parameter%20%28generic%29%20qua%20v%c3%ad%20d%e1%bb%a5&amp;url=https%3a%2f%2fduchoangmanh.github.io%2fposts%2ftechnical%2fgo-gioi-thieu-type-parameter-qua-vi-du%2f">
-        <svg version="1.1" xml:space="preserve" viewBox="2 2 28 28">
+        <svg version="1.1" xml:space="preserve" viewBox="2 2 28 28" height="30px" width="30px" fill="currentColor">
             <path
                 d="M26.49,29.86H5.5a3.37,3.37,0,0,1-2.47-1,3.35,3.35,0,0,1-1-2.47V5.48A3.36,3.36,0,0,1,3,3,3.37,3.37,0,0,1,5.5,2h21A3.38,3.38,0,0,1,29,3a3.36,3.36,0,0,1,1,2.46V26.37a3.35,3.35,0,0,1-1,2.47A3.38,3.38,0,0,1,26.49,29.86Zm-5.38-6.71a.79.79,0,0,0,.85-.66L24.73,9.24a.55.55,0,0,0-.18-.46.62.62,0,0,0-.41-.17q-.08,0-16.53,6.11a.59.59,0,0,0-.41.59.57.57,0,0,0,.43.52l4,1.24,1.61,4.83a.62.62,0,0,0,.63.43.56.56,0,0,0,.4-.17L16.54,20l4.09,3A.9.9,0,0,0,21.11,23.15ZM13.8,20.71l-1.21-4q8.72-5.55,8.78-5.55c.15,0,.23,0,.23.16a.18.18,0,0,1,0,.06s-2.51,2.3-7.52,6.8Z" />
         </svg>
     </a>
 </div>
-
   </footer>
 </article>
     </main>
     
 <footer class="footer">
-    <span>&copy; 2022 <a href="https://duchoangmanh.github.io/">duchm</a></span>
+    <span>&copy; 2024 <a href="https://duchoangmanh.github.io/">duchm</a></span>
     <span>
         Powered by
         <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
-        <a href="https://git.io/hugopapermod" rel="noopener" target="_blank">PaperMod</a>
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
     </span>
 </footer>
 <a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
@@ -585,12 +583,12 @@ thay vì</li>
 
         const copybutton = document.createElement('button');
         copybutton.classList.add('copy-code');
-        copybutton.innerText = 'copy';
+        copybutton.innerHTML = 'copy';
 
         function copyingDone() {
-            copybutton.innerText = 'copied!';
+            copybutton.innerHTML = 'copied!';
             setTimeout(() => {
-                copybutton.innerText = 'copy';
+                copybutton.innerHTML = 'copy';
             }, 2000);
         }
 
