@@ -1,6 +1,6 @@
 baseURL: "https://duchoangmanh.github.io/"
 title: duchm
-paginate: 5
+paginate: 10
 theme: PaperMod
 
 enableInlineShortcodes: true
