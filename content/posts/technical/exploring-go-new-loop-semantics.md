@@ -52,7 +52,7 @@ for i := range 10 {
 and achieve the same result, pretty neat, right?
 
 ## 3. Range over a function
-In my humble opinion, this is one of the most exciting updates to the Go language in a long time. Now Go have a standard way to handle iterator, which is a common pattern in other languages.  
+For me, this is one of the most exciting updates to the Go language in a long time. Now Go have a standard way to handle iterator, which is a common pattern in other languages.  
 With preceding go versions, there wasn't a standard way to iterate through a data structure, generic is not yet available in the language so, you couldn't write a simple iterator for different data structures.
 
 - `bufio.Scanner` is an iterator through an `io.Reader`, where the `Scan` method advances to the next value. The value is returned by a `Bytes` method. Errors are collected and returned by an `Err` method.
@@ -75,7 +75,7 @@ for v := range In10 {
 ```
 - `In10` is a function that takes a function `yield` as an argument.
 - The `yield` function takes an integer and returns a boolean, whenever `In10` is used, the loop body will specify the `yield` function, and the `In10` function will call the `yield` function with the current value of the loop variable.
-You can easily see that the yield function have a signature that return a bool but the loop body itself does not return anything, this is because inside the loop body, `continue` or nothing will be translated to `return true` and `break` will be translated to `return false`. Give the user the ability to control the iteration from the loop body.
+- You can easily see that the yield function have a signature that return a bool but the loop body itself does not return anything, this is because inside the loop body, `continue` or nothing will be translated to `return true` and `break` will be translated to `return false`. Give the user the ability to control the iteration from the loop body.
 
 The compiler will change the for over function to something that looks like this:
 ```go
@@ -84,7 +84,7 @@ Int10(func(i int) bool {
     return true
 })
 ```
-**_this explanation is somewhat oversimplified, the actual implementation is more complex, you can find more about it [here](https://go.googlesource.com/go/+/refs/changes/41/510541/7/src/cmd/compile/internal/rangefunc/rewrite.go)_**
+**_this explanation is somewhat oversimplified, the actual implementation is more complex, you can find more about it [here](https://go.googlesource.com/go/+/refs/changes/41/510541/7/src/cmd/compile/internal/rangefunc/rewrite.go)_**  
 Besides the one parameter yield function mentioned above, functions that can be ranged over can have zero or two parameters, as long as they have the following signature:
 ```go
 package iter

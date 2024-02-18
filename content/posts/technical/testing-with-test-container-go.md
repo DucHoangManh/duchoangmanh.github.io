@@ -7,6 +7,7 @@ tags: ["go", "efective-go"]
 The significance of integration testing in assuring the reliability and seamless operation of software systems cannot be understated.
 This guide will help you get started with using containers for integration testing and learn how to set up and execute test cases effectively.
 
+### 1. Use container for testing  
 Let's consider a small example program where I use postgres as the underlying database to store product records:
 ```SQL
 create table product  
@@ -180,6 +181,8 @@ func NewTestDatabase(t *testing.T) (string, string) {
 ```
 Now, the test should pass.
 
+### 2. Database per test 
+
 However, there are still some things to consider: We don't really need an entire database instance for each test as it can be resource-consuming and unnecessary.
 
 Ideally, we can reuse the previously created database instance and create a new database for each test.
@@ -275,7 +278,6 @@ func TestMain(m *testing.M) {
     // go test will decide whether the tests failed or not by exit code
     os.Exit(code)
 ```
-
 Put everything together by modifying our tests:
 ```go
 func Test_Product(t *testing.T) {
@@ -340,8 +342,8 @@ func Test_Product(t *testing.T) {
     )
 }
 ```
-We have learned how to use container for integration testing, and how to set up and execute test cases effectively.
+We have learned how to use container for integration testing, and how to set up and execute test cases effectively.   
 You can see the full code [here](https://github.com/DucHoangManh/go-test-container-postgres)
 
-#### References
+### 3. References
 - [https://golang.testcontainers.org/](https://golang.testcontainers.org/)

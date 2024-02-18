@@ -27,7 +27,7 @@
       <pubDate>Wed, 27 Dec 2023 18:31:05 +0700</pubDate>
       <guid>https://duchoangmanh.github.io/posts/technical/testing-with-test-container-go/</guid>
       <description>The significance of integration testing in assuring the reliability and seamless operation of software systems cannot be understated. This guide will help you get started with using containers for integration testing and learn how to set up and execute test cases effectively.
-Let&amp;rsquo;s consider a small example program where I use postgres as the underlying database to store product records:
+1. Use container for testing Let&amp;rsquo;s consider a small example program where I use postgres as the underlying database to store product records:
 create table product ( id serial8 not null primary key, name varchar(100) not null, type varchar(50) not null, code varchar(50) not null, price int4 not null ); The program can create, update and list products via a repository:</description>
     </item>
     <item>
