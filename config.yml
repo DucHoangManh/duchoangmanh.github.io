@@ -1,7 +1,9 @@
 baseURL: "https://duchoangmanh.github.io/"
 title: duchm
 paginate: 10
-theme: PaperMod
+theme:
+    - disqus
+    - PaperMod
 
 enableInlineShortcodes: true
 enableRobotsTXT: true
@@ -85,9 +87,11 @@ params:
           url: "https://www.linkedin.com/in/duchm"
 
     editPost:
-        URL: "https://github.com/adityatelange/hugo-PaperMod/tree/exampleSite/content"
+        URL: "mailto://duchm4@gmail.com?subject=Suggesting changes for "
         Text: "Suggest Changes" # edit text
         appendFilePath: true # to append file path to Edit link
+
+    comments: true
 
     # label:
     #     text: "Home"
@@ -119,6 +123,7 @@ params:
     #     minMatchCharLength: 0
     #     keys: ["title", "permalink", "summary", "content"]
 
+disqusShortname: duchm
 taxonomies:
     category: categories
     tag: tags
